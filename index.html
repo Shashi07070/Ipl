@@ -2,517 +2,790 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
 <title>IPL Cricket 2026</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Nunito:wght@800;900&display=swap" rel="stylesheet"/>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
-body{background:#07020f;font-family:'Nunito',sans-serif;overflow-x:hidden;}
+html,body{width:100%;height:100%;background:#000;font-family:'Nunito',sans-serif;overflow:hidden;}
 .bo{font-family:'Black Ops One',sans-serif;}
-.nb{font-family:'Nunito',sans-serif;font-weight:900;}
-input[type=number]::-webkit-inner-spin-button{opacity:1;}
-@keyframes pulse{0%,100%{background-position:0%}50%{background-position:100%}}
+
+/* ═══════════════════════════════════════
+   9:16 FRAME — everything lives inside this
+   ═══════════════════════════════════════ */
+#frame{
+  position:fixed;
+  /* Center the 9:16 box on any screen */
+  top:50%; left:50%;
+  transform:translate(-50%,-50%);
+  /* 9:16 = width * 16/9 = height, so height = width*16/9 */
+  width:min(100vw, calc(100vh * 9/16));
+  height:min(100vh, calc(100vw * 16/9));
+  background:#07020f;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+}
+
+/* ── SCREENS — all live inside #frame ── */
+.screen{display:none;width:100%;height:100%;flex-direction:column;align-items:center;overflow:hidden;}
+.screen.active{display:flex;}
+
+/* ════════════════════════════
+   SETUP SCREEN
+════════════════════════════ */
+#setupScreen{
+  background:#07020f;
+  justify-content:flex-start;
+  overflow-y:auto;
+  padding:12px 10px 16px;
+}
+/* Scrollbar hidden but functional */
+#setupScreen::-webkit-scrollbar{display:none;}
+
+.ipl-header{
+  background:linear-gradient(135deg,#001a40,#003B73,#001a40);
+  border:2px solid #FFD700;
+  border-radius:14px;
+  padding:6px 20px;
+  margin-bottom:10px;
+  text-align:center;
+  box-shadow:0 0 30px rgba(255,215,0,0.35);
+  flex-shrink:0;
+  width:100%;
+}
+.ipl-word{
+  font-family:'Black Ops One',sans-serif;
+  font-size:clamp(36px,10vw,52px);
+  background:linear-gradient(135deg,#FFD700,#FF6B00,#FFD700);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  letter-spacing:8px;line-height:1.1;
+}
+.ipl-sub{color:#888;font-size:9px;letter-spacing:3px;}
+
+.setup-card{
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,215,0,0.2);
+  border-radius:16px;
+  padding:12px;
+  width:100%;
+}
+.sec-lbl{font-size:9px;color:#FF6B00;letter-spacing:2px;font-weight:900;margin:8px 0 5px;}
+.team-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:4px;}
+.t-btn{
+  background:rgba(255,255,255,0.04);
+  border:2px solid rgba(255,255,255,0.08);
+  border-radius:10px;
+  padding:5px 6px;
+  cursor:pointer;
+  display:flex;align-items:center;gap:5px;
+  transition:all 0.15s;width:100%;
+}
+.t-btn img{width:24px;height:24px;object-fit:contain;flex-shrink:0;}
+.t-btn span{font-weight:900;font-size:11px;color:#ccc;}
+.vs-div{
+  font-family:'Black Ops One',sans-serif;
+  text-align:center;font-size:14px;
+  background:linear-gradient(135deg,#FF6B00,#FFD700);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  margin:3px 0;
+}
+.score-row{display:flex;align-items:center;gap:6px;margin-bottom:5px;}
+.score-row img{width:22px;height:22px;object-fit:contain;flex-shrink:0;}
+.score-row label{color:#777;font-size:10px;font-weight:900;width:36px;flex-shrink:0;}
+.score-row input{
+  width:60px;background:rgba(255,255,255,0.07);border:2px solid;
+  border-radius:8px;font-family:'Black Ops One',sans-serif;
+  font-size:22px;text-align:center;padding:1px 0;outline:none;flex-shrink:0;
+}
+.score-row span{color:#444;font-size:10px;}
+.win-row{display:flex;gap:6px;margin-bottom:10px;}
+.win-btn{
+  flex:1;padding:8px 4px;
+  background:rgba(255,255,255,0.04);
+  border:2px solid rgba(255,255,255,0.1);
+  border-radius:12px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:5px;
+  transition:all 0.15s;
+}
+.win-btn img{width:22px;height:22px;object-fit:contain;}
+.win-btn span{font-weight:900;font-size:12px;color:#aaa;}
+.start-btn{
+  width:100%;padding:11px;
+  background:linear-gradient(135deg,#FF6B00,#FF0055,#FF6B00);
+  background-size:200%;border:none;border-radius:12px;
+  color:white;font-family:'Black Ops One',sans-serif;
+  font-size:18px;letter-spacing:3px;cursor:pointer;
+  box-shadow:0 4px 20px rgba(255,0,85,0.55);
+  animation:pulsebg 2s infinite;
+}
+@keyframes pulsebg{0%,100%{background-position:0%}50%{background-position:100%}}
+
+/* ════════════════════════════
+   GAME SCREEN — strict 9:16
+════════════════════════════ */
+#gameScreen{
+  background:#060010;
+  justify-content:flex-start;
+  position:relative;
+}
+
+/* Scanlines */
+.scanlines{
+  position:absolute;inset:0;
+  background-image:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.08) 2px,rgba(0,0,0,0.08) 4px);
+  z-index:1;pointer-events:none;
+}
+
+/* Flash */
+.flash-overlay{
+  position:absolute;inset:0;opacity:0;z-index:999;pointer-events:none;transition:opacity 0.05s;
+}
+
+/* — SCOREBOARD — */
+.scoreboard{width:100%;padding:6px 10px;z-index:100;flex-shrink:0;}
+.score-bar{
+  background:linear-gradient(90deg,#001a40,#0d002a,#001a40);
+  border:2px solid #FFD700;border-radius:12px;
+  padding:6px 10px;
+  display:flex;align-items:center;justify-content:space-between;
+  box-shadow:0 0 20px rgba(255,215,0,0.2);
+}
+.sb-team{display:flex;align-items:center;gap:6px;flex:1;}
+.sb-team.right{flex-direction:row-reverse;}
+.sb-team img{width:32px;height:32px;object-fit:contain;transition:all 0.3s;flex-shrink:0;}
+.sb-team img.active{filter:drop-shadow(0 0 6px var(--tc));}
+.sb-team img.inactive{opacity:0.35;}
+.sb-name{font-size:8px;color:#777;letter-spacing:1px;}
+.sb-runs{font-family:'Black Ops One',sans-serif;font-size:26px;line-height:1;}
+.sb-runs .wkts{font-size:11px;color:#555;margin-left:2px;}
+.sb-center{text-align:center;padding:0 6px;flex-shrink:0;}
+.sb-ipl{font-family:'Black Ops One',sans-serif;font-size:11px;background:linear-gradient(135deg,#FFD700,#FF6B00);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:2px;}
+.sb-inn{font-size:8px;color:#FFD700;letter-spacing:1px;}
+
+/* Ball dots */
+.ball-dots{display:flex;justify-content:center;gap:6px;margin-top:5px;}
+.bdot{
+  width:26px;height:26px;border-radius:50%;
+  background:rgba(255,255,255,0.06);
+  border:2px solid rgba(255,255,255,0.1);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Black Ops One',sans-serif;font-size:11px;color:#000;
+  transition:all 0.3s;
+}
+
+/* — FIELD — takes remaining vertical space */
+.field-wrap{
+  flex:1;display:flex;align-items:center;justify-content:center;
+  width:100%;min-height:0;
+}
+.field{
+  /* Size = min of available width or ~55% of frame height */
+  width:min(72vw, calc(min(100vw, calc(100vh * 9/16)) * 0.72));
+  height:min(72vw, calc(min(100vw, calc(100vh * 9/16)) * 0.72));
+  aspect-ratio:1;
+  border-radius:50%;
+  background:radial-gradient(ellipse at 35% 30%,#1e5c1e,#0d330d 55%,#061806);
+  border:3px solid rgba(255,215,0,0.65);
+  box-shadow:0 0 50px rgba(0,180,0,0.3),0 0 15px rgba(255,215,0,0.15),inset 0 0 30px rgba(0,0,0,0.5);
+  position:relative;
+  flex-shrink:0;
+}
+.field.shake{animation:shk 0.4s;}
 @keyframes shk{0%,100%{transform:rotate(0)}20%{transform:rotate(-3deg)}40%{transform:rotate(3deg)}60%{transform:rotate(-2deg)}80%{transform:rotate(2deg)}}
+.inner-ring{position:absolute;inset:14%;border-radius:50%;border:1px solid rgba(255,255,255,0.06);}
+.pitch{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:26%;height:50%;border:1px solid rgba(255,255,255,0.1);border-radius:3px;}
+.stumps{position:absolute;left:50%;transform:translateX(-50%);display:flex;gap:4px;}
+.stumps.top{top:5%;}
+.stumps.bot{bottom:5%;}
+.stump{width:3px;height:16px;background:rgba(255,255,255,0.7);border-radius:2px;transition:all 0.2s;}
+.stump.lit{background:#FF4444;box-shadow:0 0 6px #FF3333;}
+.logo-circle{position:absolute;left:50%;transform:translateX(-50%);border-radius:50%;display:flex;align-items:center;justify-content:center;}
+.logo-bat{bottom:18%;width:58px;height:58px;border-width:3px;border-style:solid;}
+.logo-bat img{width:40px;height:40px;object-fit:contain;}
+.logo-bowl{top:8%;width:44px;height:44px;border-width:2px;border-style:solid;}
+.logo-bowl img{width:30px;height:30px;object-fit:contain;}
+.ball{
+  position:absolute;width:14px;height:14px;border-radius:50%;
+  background:radial-gradient(circle at 35% 35%,#ff7755,#8b0000);
+  border:1.5px solid rgba(255,200,200,0.5);
+  box-shadow:0 0 12px rgba(255,50,0,0.8);
+  transform:translate(-50%,-50%);display:none;z-index:25;
+  transition:left 0.48s cubic-bezier(0.25,0.46,0.45,0.94),top 0.48s cubic-bezier(0.25,0.46,0.45,0.94);
+}
+
+/* — EVENT STRIP — fixed height below field */
+.event-strip{
+  width:100%;
+  flex-shrink:0;
+  height:72px;
+  display:flex;align-items:center;justify-content:center;
+  z-index:200;pointer-events:none;
+}
+.ev-box{text-align:center;animation:pop 0.38s forwards;}
+.ev-icon{font-size:26px;line-height:1;}
+.ev-label{font-family:'Black Ops One',sans-serif;font-size:32px;letter-spacing:3px;line-height:1.1;}
+.ev-runs{font-family:'Black Ops One',sans-serif;font-size:16px;color:white;opacity:0.7;}
 @keyframes pop{0%{transform:scale(0) rotate(-12deg);opacity:0}55%{transform:scale(1.18) rotate(2deg);opacity:1}100%{transform:scale(1) rotate(0);opacity:1}}
-@keyframes fall{from{transform:translateY(0) rotate(0);opacity:1}to{transform:translateY(110vh) rotate(720deg);opacity:0}}
-@keyframes glow2{0%,100%{opacity:1}50%{opacity:0.65}}
-@keyframes bob{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-14px) rotate(4deg)}}
-@keyframes up{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
-@keyframes scanl{from{background-position:0 0}to{background-position:0 100px}}
+
+/* — SKULLS — bottom of game frame */
+.skulls{
+  flex-shrink:0;height:32px;
+  display:flex;align-items:center;justify-content:center;gap:12px;
+  z-index:100;
+}
+.skull{font-size:20px;filter:grayscale(1);opacity:0.22;transition:all 0.4s;}
+.skull.fallen{filter:none;opacity:1;transform:scale(1.2);}
+
+/* ════════════════════════════
+   RESULT SCREEN — strict 9:16
+════════════════════════════ */
+#resultScreen{
+  background:#060010;
+  justify-content:center;
+  padding:12px 10px;
+  position:relative;
+  overflow:hidden;
+}
+
+.confetti-piece{position:absolute;top:-20px;animation:fall linear forwards;z-index:50;pointer-events:none;}
+@keyframes fall{from{transform:translateY(0) rotate(0);opacity:1}to{transform:translateY(110%,) rotate(720deg);opacity:0}}
+
+.res-wrap{
+  animation:upfade 0.6s forwards;
+  text-align:center;width:100%;
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+}
+@keyframes upfade{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+.res-ipl{
+  font-family:'Black Ops One',sans-serif;
+  font-size:clamp(32px,10vw,44px);
+  background:linear-gradient(135deg,#FFD700,#FF6B00,#FFD700);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  letter-spacing:6px;
+}
+.res-sub{color:#555;font-size:9px;letter-spacing:3px;}
+
+.winner-card{
+  border-radius:22px;padding:16px 14px;
+  width:100%;
+  animation:glow2 2s infinite;
+}
+@keyframes glow2{0%,100%{opacity:1}50%{opacity:0.82}}
+.winner-lbl{font-size:9px;color:#888;letter-spacing:3px;margin-bottom:6px;}
+.winner-logo{width:70px;height:70px;object-fit:contain;animation:bob 1.8s infinite;}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-10px) rotate(4deg)}}
+.winner-name{font-family:'Black Ops One',sans-serif;font-size:clamp(28px,9vw,38px);letter-spacing:3px;margin-top:4px;line-height:1.1;}
+.winner-full{font-size:9px;letter-spacing:1px;color:#666;margin-top:2px;}
+
+.scores-row{
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:16px;padding:10px 14px;
+  display:flex;align-items:center;justify-content:space-between;
+  gap:8px;width:100%;
+}
+.res-team{text-align:center;flex:1;}
+.res-team img{width:36px;height:36px;object-fit:contain;}
+.res-team-name{font-size:8px;color:#666;letter-spacing:1px;margin:3px 0;}
+.res-team-runs{font-family:'Black Ops One',sans-serif;font-size:24px;}
+.res-team-lbl{font-size:8px;color:#444;}
+.res-vs{font-family:'Black Ops One',sans-serif;font-size:12px;color:#333;flex-shrink:0;}
+
+.new-match-btn{
+  padding:10px 32px;
+  background:linear-gradient(135deg,#FF6B00,#FF0055);
+  border:none;border-radius:12px;color:white;
+  font-family:'Black Ops One',sans-serif;font-size:16px;letter-spacing:2px;
+  cursor:pointer;box-shadow:0 4px 24px rgba(255,0,85,0.5);
+}
 </style>
 </head>
 <body>
-<div id="root"></div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
-<script type="text/babel">
+<div id="frame">
 
-const { useState, useRef } = React;
+<!-- ══ SETUP ══ -->
+<div class="screen active" id="setupScreen">
+  <div class="ipl-header">
+    <div class="ipl-word">IPL</div>
+    <div class="ipl-sub">INDIAN PREMIER LEAGUE • 2026</div>
+  </div>
+  <div class="setup-card">
+    <div class="sec-lbl">🏠 HOME TEAM</div>
+    <div class="team-grid" id="grid1"></div>
+    <div class="vs-div">VS</div>
+    <div class="sec-lbl">✈️ AWAY TEAM</div>
+    <div class="team-grid" id="grid2"></div>
+    <div class="sec-lbl">📊 FINAL SCORE</div>
+    <div class="score-row">
+      <img id="s1img" src="" alt=""/>
+      <label id="s1lbl"></label>
+      <input id="inp1" type="number" value="45" min="1" max="120"/>
+      <span>runs</span>
+    </div>
+    <div class="score-row">
+      <img id="s2img" src="" alt=""/>
+      <label id="s2lbl"></label>
+      <input id="inp2" type="number" value="38" min="1" max="120"/>
+      <span>runs</span>
+    </div>
+    <div class="sec-lbl">🏆 WINNER</div>
+    <div class="win-row">
+      <button class="win-btn" id="wbtn0" onclick="selectWinner(0)">
+        <img id="wimg0" src="" alt=""/><span id="wname0"></span>
+      </button>
+      <button class="win-btn" id="wbtn1" onclick="selectWinner(1)">
+        <img id="wimg1" src="" alt=""/><span id="wname1"></span>
+      </button>
+    </div>
+    <button class="start-btn bo" onclick="startMatch()">🏏 START MATCH</button>
+  </div>
+</div>
 
-/* ── TEAMS ── */
-const TEAMS = [
-  { id:0, name:"RCB",  full:"Royal Challengers Bengaluru", color:"#CC0000", accent:"#FFD700", logo:"img/rcb.png" },
-  { id:1, name:"MI",   full:"Mumbai Indians",              color:"#004BA0", accent:"#00CFFF", logo:"img/mi.png"  },
-  { id:2, name:"CSK",  full:"Chennai Super Kings",         color:"#FDB913", accent:"#00AEEF", logo:"img/csk.png" },
-  { id:3, name:"KKR",  full:"Kolkata Knight Riders",       color:"#8B008B", accent:"#FFD700", logo:"img/kkr.png" },
-  { id:4, name:"DC",   full:"Delhi Capitals",              color:"#0078BC", accent:"#EF1C25", logo:"img/dc.png"  },
-  { id:5, name:"PBKS", full:"Punjab Kings",                color:"#ED1B24", accent:"#FFCD00", logo:"img/pbks.png"},
-  { id:6, name:"RR",   full:"Rajasthan Royals",            color:"#E91E8C", accent:"#00D4FF", logo:"img/rr.png"  },
-  { id:7, name:"SRH",  full:"Sunrisers Hyderabad",         color:"#FF6B00", accent:"#FFD700", logo:"img/srh.png" },
-  { id:8, name:"LSG",  full:"Lucknow Super Giants",        color:"#00B4D8", accent:"#A8DADC", logo:"img/lsg.png" },
-  { id:9, name:"GT",   full:"Gujarat Titans",              color:"#1C4E8A", accent:"#00D2FF", logo:"img/gt.png"  },
+<!-- ══ GAME ══ -->
+<div class="screen" id="gameScreen">
+  <div class="scanlines"></div>
+  <div class="flash-overlay" id="flashOverlay"></div>
+
+  <!-- Scoreboard -->
+  <div class="scoreboard">
+    <div class="score-bar">
+      <div class="sb-team" id="sbTeam1">
+        <img id="sbLogo1" src="" alt="" style="--tc:#fff"/>
+        <div>
+          <div class="sb-name" id="sbName1">—</div>
+          <div class="sb-runs" id="sbRuns1">0</div>
+        </div>
+      </div>
+      <div class="sb-center">
+        <div class="sb-ipl">IPL</div>
+        <div class="sb-inn" id="sbInn">INN 1</div>
+      </div>
+      <div class="sb-team right" id="sbTeam2">
+        <img id="sbLogo2" src="" alt="" style="--tc:#fff"/>
+        <div style="text-align:right">
+          <div class="sb-name" id="sbName2">—</div>
+          <div class="sb-runs" id="sbRuns2">—</div>
+        </div>
+      </div>
+    </div>
+    <div class="ball-dots">
+      <div class="bdot" id="bd0"></div>
+      <div class="bdot" id="bd1"></div>
+      <div class="bdot" id="bd2"></div>
+      <div class="bdot" id="bd3"></div>
+      <div class="bdot" id="bd4"></div>
+      <div class="bdot" id="bd5"></div>
+    </div>
+  </div>
+
+  <!-- Field -->
+  <div class="field-wrap">
+    <div class="field" id="field">
+      <div class="inner-ring"></div>
+      <div class="pitch"></div>
+      <div class="stumps top" id="stumpsTop">
+        <div class="stump"></div><div class="stump"></div><div class="stump"></div>
+      </div>
+      <div class="stumps bot">
+        <div class="stump"></div><div class="stump"></div><div class="stump"></div>
+      </div>
+      <div class="logo-circle logo-bat" id="logoBat">
+        <img id="logoBatImg" src="" alt=""/>
+      </div>
+      <div class="logo-circle logo-bowl" id="logoBowl">
+        <img id="logoBowlImg" src="" alt=""/>
+      </div>
+      <div class="ball" id="ball"></div>
+    </div>
+  </div>
+
+  <!-- Event text strip -->
+  <div class="event-strip" id="eventStrip"></div>
+
+  <!-- Wicket skulls -->
+  <div class="skulls">
+    <div class="skull" id="skull0">👤</div>
+    <div class="skull" id="skull1">👤</div>
+  </div>
+</div>
+
+<!-- ══ RESULT ══ -->
+<div class="screen" id="resultScreen">
+  <div id="confettiWrap" style="position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:50;"></div>
+  <div class="res-wrap">
+    <div class="res-ipl">IPL</div>
+    <div class="res-sub">2026 MATCH RESULT</div>
+    <div class="winner-card" id="winnerCard">
+      <div class="winner-lbl">🏆 WINNER</div>
+      <img class="winner-logo" id="winnerLogo" src="" alt=""/>
+      <div class="winner-name bo" id="winnerName"></div>
+      <div class="winner-full" id="winnerFull"></div>
+    </div>
+    <div class="scores-row">
+      <div class="res-team">
+        <img id="res1Logo" src="" alt=""/>
+        <div class="res-team-name" id="res1Name"></div>
+        <div class="res-team-runs" id="res1Runs"></div>
+        <div class="res-team-lbl">runs</div>
+      </div>
+      <div class="res-vs">VS</div>
+      <div class="res-team">
+        <img id="res2Logo" src="" alt=""/>
+        <div class="res-team-name" id="res2Name"></div>
+        <div class="res-team-runs" id="res2Runs"></div>
+        <div class="res-team-lbl">runs</div>
+      </div>
+    </div>
+    <button class="new-match-btn" onclick="resetGame()">🔄 NEW MATCH</button>
+  </div>
+</div>
+
+</div><!-- end #frame -->
+
+<script>
+const TEAMS=[
+  {id:0,name:"RCB", full:"Royal Challengers Bengaluru",color:"#CC0000",accent:"#FFD700",logo:"img/rcb.png"},
+  {id:1,name:"MI",  full:"Mumbai Indians",             color:"#004BA0",accent:"#00CFFF",logo:"img/mi.png"},
+  {id:2,name:"CSK", full:"Chennai Super Kings",        color:"#FDB913",accent:"#00AEEF",logo:"img/csk.png"},
+  {id:3,name:"KKR", full:"Kolkata Knight Riders",      color:"#8B008B",accent:"#FFD700",logo:"img/kkr.png"},
+  {id:4,name:"DC",  full:"Delhi Capitals",             color:"#0078BC",accent:"#EF1C25",logo:"img/dc.png"},
+  {id:5,name:"PBKS",full:"Punjab Kings",               color:"#ED1B24",accent:"#FFCD00",logo:"img/pbks.png"},
+  {id:6,name:"RR",  full:"Rajasthan Royals",           color:"#E91E8C",accent:"#00D4FF",logo:"img/rr.png"},
+  {id:7,name:"SRH", full:"Sunrisers Hyderabad",        color:"#FF6B00",accent:"#FFD700",logo:"img/srh.png"},
+  {id:8,name:"LSG", full:"Lucknow Super Giants",       color:"#00B4D8",accent:"#A8DADC",logo:"img/lsg.png"},
+  {id:9,name:"GT",  full:"Gujarat Titans",             color:"#1C4E8A",accent:"#00D2FF",logo:"img/gt.png"},
 ];
 
-/* ── BALL TYPES ── */
-const TYPES = {
-  six:    { label:"SIX!",  icon:"🚀", color:"#FFD700", runs:6, w:14 },
-  four:   { label:"FOUR!", icon:"⚡", color:"#00FF88", runs:4, w:18 },
-  three:  { label:"THREE", icon:"🏃", color:"#00CFFF", runs:3, w:10 },
-  two:    { label:"TWO",   icon:"✌️", color:"#A78BFA", runs:2, w:14 },
-  one:    { label:"ONE",   icon:"↗",  color:"#94A3B8", runs:1, w:20 },
-  dot:    { label:"DOT",   icon:"⬛", color:"#475569", runs:0, w:12 },
-  wicket: { label:"OUT!",  icon:"💀", color:"#FF3333", runs:0, w:12 },
-};
+const TYPES=[
+  {type:"six",   label:"SIX!",  icon:"🚀",color:"#FFD700",runs:6,w:14},
+  {type:"four",  label:"FOUR!", icon:"⚡",color:"#00FF88",runs:4,w:18},
+  {type:"three", label:"THREE", icon:"🏃",color:"#00CFFF",runs:3,w:10},
+  {type:"two",   label:"TWO",   icon:"✌️",color:"#A78BFA",runs:2,w:14},
+  {type:"one",   label:"ONE",   icon:"↗", color:"#94A3B8",runs:1,w:20},
+  {type:"dot",   label:"DOT",   icon:"⬛",color:"#475569",runs:0,w:12},
+  {type:"wicket",label:"OUT!",  icon:"💀",color:"#FF3333",runs:0,w:12},
+];
 
-/* ── SOUND ENGINE ── */
-function createSnd(ctx) {
-  const dst = ctx.destination;
-  return {
-    bat() {
-      try {
-        const buf = ctx.createBuffer(1, Math.floor(ctx.sampleRate*0.07), ctx.sampleRate);
-        const d = buf.getChannelData(0);
-        for(let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*(1-i/d.length);
-        const s=ctx.createBufferSource(), g=ctx.createGain(), f=ctx.createBiquadFilter();
-        f.type="bandpass"; f.frequency.value=900; f.Q.value=0.6;
-        s.buffer=buf; s.connect(f); f.connect(g); g.connect(dst);
-        g.gain.setValueAtTime(0.5,ctx.currentTime);
-        g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.07);
-        s.start();
-      } catch(e){}
-    },
-    six() {
-      try {
-        [[0,"sawtooth",220,880,0.25],[0.05,"sine",1200,2400,0.12]].forEach(([d,type,f1,f2,vol])=>{
-          const o=ctx.createOscillator(),g=ctx.createGain();
-          o.connect(g);g.connect(dst);o.type=type;
-          o.frequency.setValueAtTime(f1,ctx.currentTime+d);
-          o.frequency.exponentialRampToValueAtTime(f2,ctx.currentTime+d+0.35);
-          g.gain.setValueAtTime(vol,ctx.currentTime+d);
-          g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+d+0.55);
-          o.start(ctx.currentTime+d); o.stop(ctx.currentTime+d+0.55);
-        });
-      } catch(e){}
-    },
-    four() {
-      try {
-        const o=ctx.createOscillator(),g=ctx.createGain();
-        o.connect(g);g.connect(dst);o.type="square";
-        o.frequency.setValueAtTime(440,ctx.currentTime);
-        o.frequency.exponentialRampToValueAtTime(660,ctx.currentTime+0.22);
-        g.gain.setValueAtTime(0.18,ctx.currentTime);
-        g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.35);
-        o.start();o.stop(ctx.currentTime+0.35);
-      } catch(e){}
-    },
-    wicket() {
-      try {
-        [0,0.07,0.14].forEach(d=>{
-          const o=ctx.createOscillator(),g=ctx.createGain();
-          o.connect(g);g.connect(dst);o.type="triangle";
-          o.frequency.setValueAtTime(200,ctx.currentTime+d);
-          o.frequency.exponentialRampToValueAtTime(55,ctx.currentTime+d+0.22);
-          g.gain.setValueAtTime(0.3,ctx.currentTime+d);
-          g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+d+0.25);
-          o.start(ctx.currentTime+d);o.stop(ctx.currentTime+d+0.25);
-        });
-      } catch(e){}
-    },
-    dot() {
-      try {
-        const o=ctx.createOscillator(),g=ctx.createGain();
-        o.connect(g);g.connect(dst);o.type="sine";o.frequency.value=220;
-        g.gain.setValueAtTime(0.07,ctx.currentTime);
-        g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.12);
-        o.start();o.stop(ctx.currentTime+0.12);
-      } catch(e){}
-    },
-    crowd() {
-      try {
-        const buf=ctx.createBuffer(1,Math.floor(ctx.sampleRate*0.9),ctx.sampleRate);
-        const d=buf.getChannelData(0);
-        for(let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*Math.sin(i/150)*(1-i/d.length);
-        const s=ctx.createBufferSource(),g=ctx.createGain(),f=ctx.createBiquadFilter();
-        f.type="lowpass";f.frequency.value=700;
-        s.buffer=buf;s.connect(f);f.connect(g);g.connect(dst);
-        g.gain.setValueAtTime(0.18,ctx.currentTime);
-        g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.9);
-        s.start();
-      } catch(e){}
-    }
+let sel1=0,sel2=1,winnerSel=-1,actx=null,snd=null;
+const $=id=>document.getElementById(id);
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+
+/* ── BUILD TEAM GRIDS ── */
+function buildGrids(){
+  [0,1].forEach(gi=>{
+    const sel=gi===0?sel1:sel2;
+    const grid=$('grid'+(gi+1));
+    grid.innerHTML='';
+    TEAMS.forEach(t=>{
+      const btn=document.createElement('button');
+      btn.className='t-btn';
+      btn.style.borderColor=sel===t.id?t.color:'rgba(255,255,255,0.08)';
+      btn.style.background=sel===t.id?t.color+'22':'rgba(255,255,255,0.04)';
+      if(sel===t.id) btn.style.boxShadow=`0 0 12px ${t.color}88`;
+      btn.innerHTML=`<img src="${t.logo}" onerror="this.style.display='none'"/><span style="color:${sel===t.id?t.accent:'#ccc'}">${t.name}</span>`;
+      btn.onclick=()=>{
+        if(gi===0) sel1=t.id; else sel2=t.id;
+        buildGrids(); updateUI();
+      };
+      grid.appendChild(btn);
+    });
+  });
+}
+
+function updateUI(){
+  const t1=TEAMS[sel1],t2=TEAMS[sel2];
+  // Score inputs
+  $('s1img').src=t1.logo; $('s1lbl').textContent=t1.name;
+  $('inp1').style.borderColor=t1.color; $('inp1').style.color=t1.accent;
+  $('s2img').src=t2.logo; $('s2lbl').textContent=t2.name;
+  $('inp2').style.borderColor=t2.color; $('inp2').style.color=t2.accent;
+  // Winner buttons
+  [t1,t2].forEach((t,i)=>{
+    $('wimg'+i).src=t.logo;
+    $('wname'+i).textContent=t.name;
+    $('wname'+i).style.color=winnerSel===i?t.accent:'#aaa';
+    const wb=$('wbtn'+i);
+    wb.style.borderColor=winnerSel===i?t.color:'rgba(255,255,255,0.1)';
+    wb.style.borderWidth=winnerSel===i?'3px':'2px';
+    wb.style.background=winnerSel===i?t.color+'22':'rgba(255,255,255,0.04)';
+    wb.style.boxShadow=winnerSel===i?`0 0 18px ${t.color}88`:'none';
+  });
+}
+function selectWinner(i){winnerSel=i;updateUI();}
+
+/* ── AUDIO ── */
+function initAudio(){
+  if(!actx){actx=new(window.AudioContext||window.webkitAudioContext)();snd=makeSnd(actx);}
+  if(actx.state==='suspended') actx.resume();
+}
+function makeSnd(ctx){
+  const dst=ctx.destination;
+  function osc(type,f1,f2,vol,dur,delay=0){
+    const o=ctx.createOscillator(),g=ctx.createGain();
+    o.connect(g);g.connect(dst);o.type=type;
+    o.frequency.setValueAtTime(f1,ctx.currentTime+delay);
+    if(f2) o.frequency.exponentialRampToValueAtTime(f2,ctx.currentTime+delay+dur);
+    g.gain.setValueAtTime(vol,ctx.currentTime+delay);
+    g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+delay+dur);
+    o.start(ctx.currentTime+delay);
+    o.stop(ctx.currentTime+delay+dur+0.01);
+  }
+  function noise(vol,dur,lp){
+    try{
+      const buf=ctx.createBuffer(1,Math.floor(ctx.sampleRate*dur),ctx.sampleRate);
+      const d=buf.getChannelData(0);
+      for(let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*(1-i/d.length);
+      const s=ctx.createBufferSource(),g=ctx.createGain(),f=ctx.createBiquadFilter();
+      f.type=lp?'lowpass':'bandpass';f.frequency.value=lp||900;f.Q.value=0.6;
+      s.buffer=buf;s.connect(f);f.connect(g);g.connect(dst);
+      g.gain.setValueAtTime(vol,ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+dur);
+      s.start();
+    }catch(e){}
+  }
+  return{
+    bat(){noise(0.5,0.07,null);},
+    six(){osc('sawtooth',220,880,0.25,0.55);osc('sine',1200,2400,0.12,0.5,0.05);},
+    four(){osc('square',440,660,0.18,0.35);},
+    wicket(){[0,0.07,0.14].forEach(d=>osc('triangle',200,55,0.28,0.25,d));},
+    dot(){osc('sine',220,null,0.07,0.12);},
+    crowd(){noise(0.18,0.9,700);}
   };
+}
+function playSound(type){
+  try{
+    initAudio();snd.bat();
+    if(type==='six') setTimeout(()=>{snd.six();snd.crowd();},80);
+    else if(type==='four')   setTimeout(()=>snd.four(),60);
+    else if(type==='wicket') setTimeout(()=>snd.wicket(),60);
+    else if(type==='dot')    setTimeout(()=>snd.dot(),40);
+  }catch(e){}
 }
 
 /* ── INNINGS GENERATOR ── */
-function genInnings(target) {
-  const pool=Object.entries(TYPES).map(([k,v])=>({...v,type:k}));
-  function pick(noW) {
-    const p=noW?pool.filter(e=>e.type!=="wicket"):pool;
-    const tw=p.reduce((a,b)=>a+b.w,0);
+function genInnings(target){
+  function pick(noW){
+    const pool=noW?TYPES.filter(e=>e.type!=='wicket'):TYPES;
+    const tw=pool.reduce((a,b)=>a+b.w,0);
     let r=Math.random()*tw;
-    for(const e of p){r-=e.w;if(r<=0)return{...e};}
-    return{...p[p.length-1]};
+    for(const e of pool){r-=e.w;if(r<=0)return{...e};}
+    return{...pool[pool.length-1]};
   }
-  const balls=[]; let runs=0,wickets=0;
+  const balls=[];let runs=0,wickets=0;
   for(let i=0;i<6;i++){
     let ev;
     if(i===5){
       const need=target-runs;
-      if(need>=6)       ev={...TYPES.six,   type:"six"};
-      else if(need>=4)  ev={...TYPES.four,  type:"four"};
-      else if(need===3) ev={...TYPES.three, type:"three"};
-      else if(need===2) ev={...TYPES.two,   type:"two"};
-      else if(need===1) ev={...TYPES.one,   type:"one"};
-      else              ev={...TYPES.dot,   type:"dot"};
+      if(need>=6)       ev={...TYPES[0]};
+      else if(need>=4)  ev={...TYPES[1]};
+      else if(need===3) ev={...TYPES[2]};
+      else if(need===2) ev={...TYPES[3]};
+      else if(need===1) ev={...TYPES[4]};
+      else              ev={...TYPES[5]};
     } else {
       ev=pick(wickets>=1);
       let s=0;
       while(runs+ev.runs>target+3&&s++<5) ev=pick(wickets>=1);
     }
-    if(ev.type==="wicket") wickets++;
+    if(ev.type==='wicket') wickets++;
     runs+=ev.runs;
-    balls.push({...ev,ballNum:i+1,cumRuns:runs,cumWkts:wickets});
+    balls.push({...ev,cumRuns:runs,cumWkts:wickets});
     if(wickets>=2) break;
   }
   return balls;
 }
 
-const sleep=ms=>new Promise(r=>setTimeout(r,ms));
-
-/* ══════════════════════════ MAIN APP ══════════════════════════ */
-function App(){
-  const [screen,setScreen]=useState("setup");
-  const [sel1,setSel1]=useState(0);
-  const [sel2,setSel2]=useState(1);
-  const [score1,setScore1]=useState("45");
-  const [score2,setScore2]=useState("38");
-  const [winnerIdx,setWinnerIdx]=useState(-1);
-
-  const [phase,setPhase]=useState(1);
-  const [history,setHistory]=useState([]);
-  const [curEv,setCurEv]=useState(null);
-  const [showEv,setShowEv]=useState(false);
-  const [evKey,setEvKey]=useState(0);
-  const [ballPos,setBallPos]=useState({x:50,y:62,show:false});
-  const [shake,setShake]=useState(false);
-  const [flashCol,setFlashCol]=useState(null);
-
-  const [r1,setR1]=useState(0);
-  const [w1,setW1]=useState(0);
-  const [r2,setR2]=useState(null);
-  const [w2,setW2]=useState(0);
-
-  const [confetti,setConfetti]=useState([]);
-  const [result,setResult]=useState(null);
-
-  const actx=useRef(null);
-  const snd=useRef(null);
-
-  const t1=TEAMS[sel1], t2=TEAMS[sel2];
-  const batting=phase===1?t1:t2;
-  const bowling=phase===1?t2:t1;
-
-  function audio(){
-    if(!actx.current){
-      actx.current=new(window.AudioContext||window.webkitAudioContext)();
-      snd.current=createSnd(actx.current);
-    }
-    if(actx.current.state==="suspended") actx.current.resume();
-    return snd.current;
+/* ── DOM HELPERS ── */
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  $(id).classList.add('active');
+}
+function flashScreen(color){
+  const el=$('flashOverlay');
+  el.style.background=color;el.style.opacity='0.16';
+  setTimeout(()=>el.style.opacity='0',100);
+}
+function resetDots(){
+  for(let i=0;i<6;i++){
+    const d=$('bd'+i);
+    d.style.background='rgba(255,255,255,0.06)';
+    d.style.borderColor='rgba(255,255,255,0.1)';
+    d.style.boxShadow='none';d.textContent='';
   }
-
-  function play(type){
-    try{
-      const s=audio();
-      s.bat();
-      if(type==="six")    setTimeout(()=>{s.six();s.crowd();},80);
-      else if(type==="four")   setTimeout(()=>s.four(),60);
-      else if(type==="wicket") setTimeout(()=>s.wicket(),60);
-      else if(type==="dot")    setTimeout(()=>s.dot(),40);
-    }catch(e){}
-  }
-
-  async function animBall(ev){
-    let tx=50,ty=15;
-    if(ev.type==="six")    {tx=10+Math.random()*80;ty=4;}
-    else if(ev.type==="four")   {tx=Math.random()<0.5?4:90;ty=30+Math.random()*30;}
-    else if(ev.type==="wicket") {tx=50;ty=12;}
-    else                        {tx=38+Math.random()*24;ty=28+Math.random()*22;}
-    setBallPos({x:50,y:62,show:true});
-    await sleep(40);
-    setBallPos({x:tx,y:ty,show:true});
-    await sleep(520);
-    setBallPos(p=>({...p,show:false}));
-  }
-
-  async function showEvent(ev,key){
-    setCurEv(ev); setEvKey(key); setShowEv(true);
-    setFlashCol(ev.color);
-    await sleep(80); setFlashCol(null);
-    if(ev.type==="wicket"){setShake(true);await sleep(380);setShake(false);}
-    await sleep(680);
-    setShowEv(false); setCurEv(null);
-  }
-
-  async function playInn(arr,inn){
-    for(let i=0;i<arr.length;i++){
-      const ev=arr[i];
-      play(ev.type);
-      await Promise.all([animBall(ev), showEvent(ev,inn*100+i)]);
-      if(inn===1){setR1(ev.cumRuns);setW1(ev.cumWkts);}
-      else       {setR2(ev.cumRuns);setW2(ev.cumWkts);}
-      setHistory(h=>[...h,ev]);
-      await sleep(220);
-    }
-  }
-
-  async function startMatch(){
-    if(winnerIdx===-1){alert("Winner select karo!");return;}
-    audio();
-    const tgt1=Math.max(1,parseInt(score1)||40);
-    const tgt2=Math.max(1,parseInt(score2)||30);
-    const inn1=genInnings(tgt1);
-    const inn2=genInnings(tgt2);
-
-    setR1(0);setW1(0);setR2(null);setW2(0);
-    setHistory([]);setCurEv(null);setShowEv(false);
-    setPhase(1);setConfetti([]);setResult(null);
-    setScreen("game");
-    await sleep(400);
-
-    await playInn(inn1,1);
-    await sleep(800);
-    setPhase(2); setHistory([]);
-    await sleep(400);
-    await playInn(inn2,2);
-    await sleep(500);
-
-    const winner=winnerIdx===0?t1:t2;
-    const final1=inn1[inn1.length-1].cumRuns;
-    const final2=inn2[inn2.length-1].cumRuns;
-    setResult({winner,final1,final2});
-    const cols=[winner.color,"#FFD700","#FF6B00","#fff","#00FF88","#FF69B4"];
-    setConfetti(Array.from({length:80},(_,i)=>({
-      id:i,left:Math.random()*100,color:cols[i%cols.length],
-      delay:Math.random()*1.2,dur:1.3+Math.random()*1.5,
-      size:7+Math.random()*9,round:Math.random()>0.5,rot:Math.random()*360,
-    })));
-    try{audio().crowd();}catch(e){}
-    setScreen("result");
-  }
-
-  function reset(){
-    setScreen("setup");setWinnerIdx(-1);
-    setR1(0);setW1(0);setR2(null);setW2(0);
-    setHistory([]);setCurEv(null);setShowEv(false);
-    setConfetti([]);setFlashCol(null);setShake(false);
-  }
-
-  /* ════ SETUP SCREEN ════ */
-  if(screen==="setup") return (
-    <div style={{minHeight:"100vh",background:"#07020f",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:14,overflowY:"auto"}}>
-
-      {/* IPL Header */}
-      <div style={{background:"linear-gradient(135deg,#001a40,#003B73,#001a40)",border:"3px solid #FFD700",borderRadius:20,padding:"10px 36px",marginBottom:18,textAlign:"center",boxShadow:"0 0 50px rgba(255,215,0,0.35)"}}>
-        <div className="bo" style={{fontSize:64,background:"linear-gradient(135deg,#FFD700,#FF6B00,#FFD700)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",letterSpacing:12,lineHeight:1.1}}>IPL</div>
-        <div style={{color:"#888",fontSize:10,letterSpacing:4}}>INDIAN PREMIER LEAGUE • 2026</div>
-      </div>
-
-      <div style={{background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,215,0,0.2)",borderRadius:22,padding:18,width:"100%",maxWidth:420}}>
-        <div className="bo" style={{color:"#FF6B00",fontSize:13,letterSpacing:3,marginBottom:12,textAlign:"center"}}>⚙️ MATCH SETUP</div>
-
-        {/* Team selectors */}
-        {[{label:"🏠 HOME TEAM",selId:sel1,onSel:setSel1},{label:"✈️ AWAY TEAM",selId:sel2,onSel:setSel2}].map(({label,selId,onSel},gi)=>(
-          <div key={gi}>
-            {gi===1&&<div className="bo" style={{textAlign:"center",fontSize:18,background:"linear-gradient(135deg,#FF6B00,#FFD700)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",margin:"6px 0"}}>VS</div>}
-            <div className="nb" style={{fontSize:10,color:"#FF6B00",letterSpacing:3,marginBottom:8}}>{label}</div>
-            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6,marginBottom:6}}>
-              {TEAMS.map(t=>(
-                <button key={t.id} onClick={()=>onSel(t.id)}
-                  style={{background:selId===t.id?`${t.color}22`:"rgba(255,255,255,0.04)",border:`2px solid ${selId===t.id?t.color:"rgba(255,255,255,0.08)"}`,borderRadius:12,padding:"7px 8px",cursor:"pointer",display:"flex",alignItems:"center",gap:7,boxShadow:selId===t.id?`0 0 14px ${t.color}88`:"none",transition:"all 0.15s"}}>
-                  <img src={t.logo} style={{width:30,height:30,objectFit:"contain"}} alt={t.name}
-                    onError={e=>{e.target.style.display="none";}}/>
-                  <span className="nb" style={{color:selId===t.id?t.accent:"#ccc",fontSize:12}}>{t.name}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-        ))}
-
-        {/* Scores */}
-        <div className="nb" style={{fontSize:10,color:"#FF6B00",letterSpacing:3,margin:"12px 0 8px"}}>📊 FINAL SCORE</div>
-        {[{t:t1,val:score1,set:setScore1},{t:t2,val:score2,set:setScore2}].map(({t,val,set},i)=>(
-          <div key={i} style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
-            <img src={t.logo} style={{width:26,height:26,objectFit:"contain"}} alt=""/>
-            <span className="nb" style={{color:"#777",fontSize:11,width:46}}>{t.name}</span>
-            <input type="number" value={val} onChange={e=>set(e.target.value)}
-              style={{width:70,background:"rgba(255,255,255,0.07)",border:`2px solid ${t.color}`,borderRadius:10,color:t.accent,fontSize:26,fontFamily:"'Black Ops One',sans-serif",textAlign:"center",padding:"2px 0",outline:"none"}}/>
-            <span style={{color:"#444",fontSize:11}}>runs</span>
-          </div>
-        ))}
-
-        {/* Winner */}
-        <div className="nb" style={{fontSize:10,color:"#FF6B00",letterSpacing:3,margin:"12px 0 8px"}}>🏆 WINNER</div>
-        <div style={{display:"flex",gap:8,marginBottom:18}}>
-          {[t1,t2].map((t,idx)=>(
-            <button key={idx} onClick={()=>setWinnerIdx(idx)}
-              style={{flex:1,padding:"11px 6px",background:winnerIdx===idx?`${t.color}22`:"rgba(255,255,255,0.04)",border:`${winnerIdx===idx?3:2}px solid ${winnerIdx===idx?t.color:"rgba(255,255,255,0.1)"}`,borderRadius:14,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:7,boxShadow:winnerIdx===idx?`0 0 20px ${t.color}88`:"none",transition:"all 0.15s"}}>
-              <img src={t.logo} style={{width:26,height:26,objectFit:"contain"}} alt=""/>
-              <span className="nb" style={{color:winnerIdx===idx?t.accent:"#aaa",fontSize:13}}>{t.name}</span>
-            </button>
-          ))}
-        </div>
-
-        <button onClick={startMatch}
-          style={{width:"100%",padding:15,background:"linear-gradient(135deg,#FF6B00,#FF0055,#FF6B00)",backgroundSize:"200%",border:"none",borderRadius:16,color:"white",fontFamily:"'Black Ops One',sans-serif",fontSize:22,letterSpacing:3,cursor:"pointer",boxShadow:"0 4px 30px rgba(255,0,85,0.55)",animation:"pulse 2s infinite"}}>
-          🏏 START MATCH
-        </button>
-      </div>
-    </div>
-  );
-
-  /* ════ GAME SCREEN ════ */
-  if(screen==="game") return (
-    <div style={{width:"100vw",height:"100vh",background:"#060010",position:"relative",overflow:"hidden",display:"flex",flexDirection:"column",alignItems:"center"}}>
-
-      {/* Flash overlay */}
-      {flashCol&&<div style={{position:"fixed",inset:0,background:flashCol,opacity:0.16,zIndex:999,pointerEvents:"none"}}/>}
-      {/* Scanlines */}
-      <div style={{position:"fixed",inset:0,backgroundImage:"repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.1) 2px,rgba(0,0,0,0.1) 4px)",zIndex:1,pointerEvents:"none"}}/>
-
-      {/* SCOREBOARD */}
-      <div style={{width:"100%",padding:"8px 12px",zIndex:100,flexShrink:0}}>
-        <div style={{background:"linear-gradient(90deg,#001a40,#0d002a,#001a40)",border:"2px solid #FFD700",borderRadius:14,padding:"8px 14px",display:"flex",alignItems:"center",justifyContent:"space-between",boxShadow:"0 0 28px rgba(255,215,0,0.22)"}}>
-          {/* Team 1 */}
-          <div style={{display:"flex",alignItems:"center",gap:8,flex:1}}>
-            <img src={t1.logo} style={{width:38,height:38,objectFit:"contain",filter:phase===1?`drop-shadow(0 0 8px ${t1.color})`:"none",opacity:phase===1?1:0.45}} alt=""/>
-            <div>
-              <div style={{fontSize:9,color:"#777",letterSpacing:2}}>{t1.name}</div>
-              <div className="bo" style={{fontSize:30,color:phase===1?t1.accent:"#aaa",lineHeight:1}}>
-                {r1}{w1>0&&<span style={{fontSize:13,color:"#555",marginLeft:2}}>/{w1}w</span>}
-              </div>
-            </div>
-          </div>
-          {/* Center */}
-          <div style={{textAlign:"center",padding:"0 8px",flexShrink:0}}>
-            <div className="bo" style={{fontSize:12,background:"linear-gradient(135deg,#FFD700,#FF6B00)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",letterSpacing:3}}>IPL</div>
-            <div style={{fontSize:9,color:"#FFD700",letterSpacing:1}}>INN {phase}</div>
-          </div>
-          {/* Team 2 */}
-          <div style={{display:"flex",alignItems:"center",gap:8,flex:1,flexDirection:"row-reverse"}}>
-            <img src={t2.logo} style={{width:38,height:38,objectFit:"contain",filter:phase===2?`drop-shadow(0 0 8px ${t2.color})`:"none",opacity:phase===2?1:0.45}} alt=""/>
-            <div style={{textAlign:"right"}}>
-              <div style={{fontSize:9,color:"#777",letterSpacing:2}}>{t2.name}</div>
-              <div className="bo" style={{fontSize:30,color:phase===2?t2.accent:"#777",lineHeight:1}}>
-                {r2===null?"—":<span>{r2}{w2>0&&<span style={{fontSize:13,color:"#555",marginLeft:2}}>/{w2}w</span>}</span>}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Ball dots */}
-        <div style={{display:"flex",justifyContent:"center",gap:7,marginTop:7}}>
-          {Array.from({length:6},(_,i)=>{
-            const b=history[i];
-            return(
-              <div key={i} style={{width:30,height:30,borderRadius:"50%",background:b?b.color:"rgba(255,255,255,0.06)",border:`2px solid ${b?b.color:"rgba(255,255,255,0.1)"}`,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"'Black Ops One',sans-serif",fontSize:13,color:"#000",boxShadow:b?`0 0 12px ${b.color}99`:"none",transition:"all 0.3s"}}>
-                {b?(b.type==="wicket"?"W":b.runs===0?"·":b.runs):""}
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* FIELD */}
-      <div style={{flex:1,display:"flex",alignItems:"center",justifyContent:"center",width:"100%",minHeight:0}}>
-        <div style={{position:"relative",width:"min(80vw,320px)",height:"min(80vw,320px)",borderRadius:"50%",background:"radial-gradient(ellipse at 35% 30%,#1e5c1e,#0d330d 55%,#061806)",border:"4px solid rgba(255,215,0,0.65)",boxShadow:"0 0 70px rgba(0,180,0,0.3),0 0 20px rgba(255,215,0,0.15),inset 0 0 40px rgba(0,0,0,0.5)",animation:shake?"shk 0.4s":"none"}}>
-          <div style={{position:"absolute",inset:"14%",borderRadius:"50%",border:"1px solid rgba(255,255,255,0.06)"}}/>
-          <div style={{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-50%)",width:"26%",height:"50%",border:"1px solid rgba(255,255,255,0.1)",borderRadius:4}}/>
-
-          {/* Stumps top */}
-          <div style={{position:"absolute",top:"5%",left:"50%",transform:"translateX(-50%)",display:"flex",gap:5}}>
-            {[0,1,2].map(i=><div key={i} style={{width:4,height:20,background:curEv&&curEv.type==="wicket"?"#FF4444":"rgba(255,255,255,0.7)",borderRadius:2,transition:"all 0.2s",boxShadow:curEv&&curEv.type==="wicket"?"0 0 8px #FF3333":"none"}}/>)}
-          </div>
-          {/* Stumps bottom */}
-          <div style={{position:"absolute",bottom:"5%",left:"50%",transform:"translateX(-50%)",display:"flex",gap:5}}>
-            {[0,1,2].map(i=><div key={i} style={{width:4,height:20,background:"rgba(255,255,255,0.7)",borderRadius:2}}/>)}
-          </div>
-
-          {/* Batting logo */}
-          <div style={{position:"absolute",bottom:"20%",left:"50%",transform:"translateX(-50%)",width:64,height:64,borderRadius:"50%",background:`radial-gradient(circle,${batting.color}55,#000)`,border:`3px solid ${batting.color}`,display:"flex",alignItems:"center",justifyContent:"center",boxShadow:`0 0 28px ${batting.color}cc`,zIndex:10}}>
-            <img src={batting.logo} style={{width:44,height:44,objectFit:"contain"}} alt=""/>
-          </div>
-          {/* Bowling logo */}
-          <div style={{position:"absolute",top:"10%",left:"50%",transform:"translateX(-50%)",width:50,height:50,borderRadius:"50%",background:`radial-gradient(circle,${bowling.color}33,#000)`,border:`2px solid ${bowling.color}55`,display:"flex",alignItems:"center",justifyContent:"center",boxShadow:`0 0 14px ${bowling.color}66`,zIndex:10}}>
-            <img src={bowling.logo} style={{width:34,height:34,objectFit:"contain"}} alt=""/>
-          </div>
-
-          {/* Ball */}
-          {ballPos.show&&(
-            <div style={{position:"absolute",left:`${ballPos.x}%`,top:`${ballPos.y}%`,transform:"translate(-50%,-50%)",width:16,height:16,borderRadius:"50%",background:"radial-gradient(circle at 35% 35%,#ff7755,#8b0000)",border:"1.5px solid rgba(255,200,200,0.5)",boxShadow:"0 0 14px rgba(255,50,0,0.8)",transition:"left 0.48s cubic-bezier(0.25,0.46,0.45,0.94),top 0.48s cubic-bezier(0.25,0.46,0.45,0.94)",zIndex:25}}/>
-          )}
-        </div>
-      </div>
-
-      {/* EVENT STRIP — below field, never on logo */}
-      <div style={{width:"100%",height:88,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",zIndex:200,pointerEvents:"none"}}>
-        {showEv&&curEv&&(
-          <div key={evKey} style={{textAlign:"center",animation:"pop 0.38s forwards"}}>
-            <div style={{fontSize:32,lineHeight:1}}>{curEv.icon}</div>
-            <div className="bo" style={{fontSize:38,color:curEv.color,textShadow:`0 0 22px ${curEv.color},0 0 44px ${curEv.color}88`,letterSpacing:3,lineHeight:1.1}}>{curEv.label}</div>
-            {curEv.runs>0&&<div className="bo" style={{fontSize:20,color:"white",opacity:0.7}}>+{curEv.runs}</div>}
-          </div>
-        )}
-      </div>
-
-      {/* Wicket skulls */}
-      <div style={{position:"fixed",bottom:6,left:"50%",transform:"translateX(-50%)",display:"flex",gap:10,zIndex:100}}>
-        {[0,1].map(i=>{
-          const fallen=phase===1?w1>i:w2>i;
-          return <div key={i} style={{fontSize:22,filter:fallen?"none":"grayscale(1)",opacity:fallen?1:0.22,transition:"all 0.4s",transform:fallen?"scale(1.2)":"scale(1)"}}>{fallen?"💀":"👤"}</div>;
-        })}
-      </div>
-    </div>
-  );
-
-  /* ════ RESULT SCREEN ════ */
-  if(screen==="result"&&result){
-    const {winner,final1,final2}=result;
-    return(
-      <div style={{minHeight:"100vh",background:"#060010",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:16,position:"relative",overflow:"hidden"}}>
-
-        {confetti.map(c=>(
-          <div key={c.id} style={{position:"fixed",left:`${c.left}vw`,top:-20,width:c.size,height:c.size,background:c.color,borderRadius:c.round?"50%":3,animation:`fall ${c.dur}s ${c.delay}s linear forwards`,zIndex:50,pointerEvents:"none",transform:`rotate(${c.rot}deg)`}}/>
-        ))}
-
-        <div style={{animation:"up 0.6s forwards",textAlign:"center",width:"100%",maxWidth:400}}>
-          <div className="bo" style={{fontSize:52,background:"linear-gradient(135deg,#FFD700,#FF6B00,#FFD700)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",letterSpacing:8,marginBottom:2}}>IPL</div>
-          <div style={{color:"#555",fontSize:10,letterSpacing:4,marginBottom:20}}>2026 MATCH RESULT</div>
-
-          <div style={{background:`linear-gradient(135deg,${winner.color}20,${winner.accent}10,${winner.color}20)`,border:`3px solid ${winner.color}`,borderRadius:28,padding:"24px 20px",marginBottom:14,boxShadow:`0 0 70px ${winner.color}55`,animation:"glow2 2s infinite"}}>
-            <div style={{fontSize:11,color:"#888",letterSpacing:4,marginBottom:10}}>🏆 WINNER</div>
-            <img src={winner.logo} style={{width:88,height:88,objectFit:"contain",animation:"bob 1.8s infinite",filter:`drop-shadow(0 0 22px ${winner.color})`}} alt=""/>
-            <div className="bo" style={{fontSize:48,color:winner.accent,letterSpacing:4,textShadow:`0 0 40px ${winner.accent}`,marginTop:8,lineHeight:1}}>{winner.name}</div>
-            <div style={{color:"#666",fontSize:11,letterSpacing:2,marginTop:4}}>{winner.full}</div>
-          </div>
-
-          <div style={{background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:20,padding:"14px 20px",display:"flex",alignItems:"center",justifyContent:"space-between",gap:10,marginBottom:18}}>
-            {[{t:t1,r:final1},{t:t2,r:final2}].map(({t,r},i)=>(
-              <div key={i} style={{textAlign:"center",flex:1}}>
-                <img src={t.logo} style={{width:42,height:42,objectFit:"contain",filter:t.id===winner.id?`drop-shadow(0 0 10px ${t.color})`:"grayscale(0.6)",opacity:t.id===winner.id?1:0.5}} alt=""/>
-                <div style={{fontSize:9,color:"#666",letterSpacing:2,margin:"4px 0"}}>{t.name}</div>
-                <div className="bo" style={{fontSize:30,color:t.id===winner.id?t.accent:"#555"}}>{r}</div>
-                <div style={{fontSize:9,color:"#444"}}>runs</div>
-              </div>
-            ))}
-            <div className="bo" style={{fontSize:14,color:"#333",flexShrink:0}}>VS</div>
-          </div>
-
-          <button onClick={reset} style={{padding:"13px 40px",background:"linear-gradient(135deg,#FF6B00,#FF0055)",border:"none",borderRadius:16,color:"white",fontFamily:"'Black Ops One',sans-serif",fontSize:18,letterSpacing:3,cursor:"pointer",boxShadow:"0 4px 30px rgba(255,0,85,0.5)"}}>
-            🔄 NEW MATCH
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  return null;
+}
+function setDot(i,ev){
+  const d=$('bd'+i);
+  d.style.background=ev.color;d.style.borderColor=ev.color;
+  d.style.boxShadow=`0 0 10px ${ev.color}99`;
+  d.textContent=ev.type==='wicket'?'W':ev.runs===0?'·':ev.runs;
+}
+function setSkull(i,on){
+  const el=$('skull'+i);
+  el.textContent=on?'💀':'👤';
+  el.classList.toggle('fallen',on);
 }
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(<App/>);
+/* ── BALL ANIMATION ── */
+async function animBall(ev){
+  const ball=$('ball');
+  let tx=50,ty=15;
+  if(ev.type==='six')    {tx=10+Math.random()*80;ty=4;}
+  else if(ev.type==='four')   {tx=Math.random()<0.5?4:90;ty=30+Math.random()*30;}
+  else if(ev.type==='wicket') {tx=50;ty=12;}
+  else                        {tx=38+Math.random()*24;ty=28+Math.random()*22;}
+  ball.style.display='block';
+  ball.style.left='50%';ball.style.top='62%';
+  await sleep(40);
+  ball.style.left=tx+'%';ball.style.top=ty+'%';
+  await sleep(520);
+  ball.style.display='none';
+}
+
+/* ── EVENT TEXT ── */
+function showEventText(ev){
+  const strip=$('eventStrip');
+  strip.innerHTML=`<div class="ev-box">
+    <div class="ev-icon">${ev.icon}</div>
+    <div class="ev-label" style="color:${ev.color};text-shadow:0 0 20px ${ev.color},0 0 40px ${ev.color}88">${ev.label}</div>
+    ${ev.runs>0?`<div class="ev-runs">+${ev.runs}</div>`:''}
+  </div>`;
+  return sleep(900).then(()=>strip.innerHTML='');
+}
+
+/* ── PLAY ONE INNINGS ── */
+async function playInnings(balls,innNum,batting,bowling){
+  // Setup field logos
+  const bc=$('logoBat');
+  bc.style.borderColor=batting.color;
+  bc.style.background=`radial-gradient(circle,${batting.color}55,#000)`;
+  bc.style.boxShadow=`0 0 24px ${batting.color}cc`;
+  $('logoBatImg').src=batting.logo;
+
+  const bwc=$('logoBowl');
+  bwc.style.borderColor=bowling.color+'55';
+  bwc.style.background=`radial-gradient(circle,${bowling.color}33,#000)`;
+  bwc.style.boxShadow=`0 0 12px ${bowling.color}66`;
+  $('logoBowlImg').src=bowling.logo;
+
+  // Scoreboard
+  if(innNum===1){
+    $('sbLogo1').classList.replace('inactive','active')||$('sbLogo1').classList.add('active');
+    $('sbLogo2').classList.replace('active','inactive')||$('sbLogo2').classList.add('inactive');
+    $('sbRuns1').textContent='0';
+    $('sbRuns2').textContent='—';
+  } else {
+    $('sbLogo2').classList.replace('inactive','active')||$('sbLogo2').classList.add('active');
+    $('sbLogo1').classList.replace('active','inactive')||$('sbLogo1').classList.add('inactive');
+    $('sbRuns2').textContent='0';
+  }
+  $('sbInn').textContent='INN '+innNum;
+
+  resetDots();
+  document.querySelectorAll('.stump').forEach(s=>s.classList.remove('lit'));
+  setSkull(0,false);setSkull(1,false);
+
+  for(let i=0;i<balls.length;i++){
+    const ev=balls[i];
+    playSound(ev.type);
+    flashScreen(ev.color);
+
+    if(ev.type==='wicket'){
+      $('stumpsTop').querySelectorAll('.stump').forEach(s=>s.classList.add('lit'));
+      $('field').classList.add('shake');
+      await sleep(380);
+      $('field').classList.remove('shake');
+      $('stumpsTop').querySelectorAll('.stump').forEach(s=>s.classList.remove('lit'));
+    }
+
+    await Promise.all([animBall(ev), showEventText(ev)]);
+
+    // Update scoreboard with exact innings value
+    if(innNum===1){
+      $('sbRuns1').innerHTML=ev.cumRuns+(ev.cumWkts>0?`<span class="wkts">/${ev.cumWkts}w</span>`:'');
+      $('sbRuns1').style.color=TEAMS[sel1].accent;
+    } else {
+      $('sbRuns2').innerHTML=ev.cumRuns+(ev.cumWkts>0?`<span class="wkts">/${ev.cumWkts}w</span>`:'');
+      $('sbRuns2').style.color=TEAMS[sel2].accent;
+    }
+
+    setDot(i,ev);
+    setSkull(0,ev.cumWkts>=1);
+    setSkull(1,ev.cumWkts>=2);
+
+    await sleep(180);
+  }
+}
+
+/* ── START MATCH ── */
+async function startMatch(){
+  if(winnerSel===-1){alert('Winner select karo!');return;}
+  initAudio();
+  const t1=TEAMS[sel1],t2=TEAMS[sel2];
+  const tgt1=Math.max(1,parseInt($('inp1').value)||40);
+  const tgt2=Math.max(1,parseInt($('inp2').value)||30);
+  const inn1=genInnings(tgt1);
+  const inn2=genInnings(tgt2);
+
+  $('sbLogo1').src=t1.logo;$('sbLogo1').style.setProperty('--tc',t1.color);
+  $('sbLogo2').src=t2.logo;$('sbLogo2').style.setProperty('--tc',t2.color);
+  $('sbName1').textContent=t1.name;
+  $('sbName2').textContent=t2.name;
+
+  showScreen('gameScreen');
+  await sleep(300);
+
+  await playInnings(inn1,1,t1,t2);
+  await sleep(700);
+  await playInnings(inn2,2,t2,t1);
+  await sleep(500);
+
+  const winner=winnerSel===0?t1:t2;
+  showResult(winner,t1,t2,inn1[inn1.length-1].cumRuns,inn2[inn2.length-1].cumRuns);
+}
+
+/* ── RESULT ── */
+function showResult(winner,t1,t2,final1,final2){
+  const card=$('winnerCard');
+  card.style.background=`linear-gradient(135deg,${winner.color}22,${winner.accent}11,${winner.color}22)`;
+  card.style.border=`3px solid ${winner.color}`;
+  card.style.boxShadow=`0 0 60px ${winner.color}55`;
+  $('winnerLogo').src=winner.logo;
+  $('winnerLogo').style.filter=`drop-shadow(0 0 20px ${winner.color})`;
+  $('winnerName').textContent=winner.name;
+  $('winnerName').style.color=winner.accent;
+  $('winnerName').style.textShadow=`0 0 30px ${winner.accent}`;
+  $('winnerFull').textContent=winner.full;
+
+  [[t1,final1,'1'],[t2,final2,'2']].forEach(([t,r,n])=>{
+    $('res'+n+'Logo').src=t.logo;
+    $('res'+n+'Logo').style.filter=t.id===winner.id?`drop-shadow(0 0 8px ${t.color})`:'grayscale(0.6)';
+    $('res'+n+'Logo').style.opacity=t.id===winner.id?'1':'0.45';
+    $('res'+n+'Name').textContent=t.name;
+    $('res'+n+'Runs').textContent=r;
+    $('res'+n+'Runs').style.color=t.id===winner.id?t.accent:'#555';
+  });
+
+  // Confetti inside frame
+  const wrap=$('confettiWrap');wrap.innerHTML='';
+  const cols=[winner.color,'#FFD700','#FF6B00','#fff','#00FF88','#FF69B4'];
+  for(let i=0;i<70;i++){
+    const el=document.createElement('div');
+    el.className='confetti-piece';
+    const sz=6+Math.random()*8;
+    el.style.cssText=`left:${Math.random()*100}%;width:${sz}px;height:${sz}px;background:${cols[i%cols.length]};border-radius:${Math.random()>0.5?'50%':'3px'};animation-duration:${1.4+Math.random()*1.4}s;animation-delay:${Math.random()*1.1}s;`;
+    wrap.appendChild(el);
+  }
+  try{initAudio();snd.crowd();}catch(e){}
+  showScreen('resultScreen');
+}
+
+function resetGame(){winnerSel=-1;updateUI();showScreen('setupScreen');}
+
+/* ── INIT ── */
+buildGrids();
+updateUI();
 </script>
 </body>
 </html>
