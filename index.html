@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ads Manager UI Mockup & Screenshot Generator (9:16)</title>
+  <title>Ads Manager UI Mockup & 9:16 Screenshot Downloader</title>
   <!-- Google Fonts: Roboto & Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -86,6 +86,7 @@
       font-weight: 600;
       display: inline-flex;
       align-items: center;
+      justify-content: center;
       gap: 8px;
       transition: all 0.2s ease;
     }
@@ -112,6 +113,14 @@
       color: #fff;
     }
 
+    .btn-large {
+      width: 100%;
+      padding: 13px 20px;
+      font-size: 0.95rem;
+      border-radius: 10px;
+      margin-top: 14px;
+    }
+
     /* Workspace Layout */
     .workspace {
       display: flex;
@@ -133,6 +142,8 @@
       max-height: calc(100vh - 90px);
       overflow-y: auto;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      display: flex;
+      flex-direction: column;
     }
 
     .dashboard-panel::-webkit-scrollbar {
@@ -141,6 +152,10 @@
     .dashboard-panel::-webkit-scrollbar-thumb {
       background: rgba(255, 255, 255, 0.15);
       border-radius: 4px;
+    }
+
+    .panel-content {
+      flex: 1;
     }
 
     .section-title {
@@ -231,10 +246,18 @@
       color: #94a3b8;
     }
 
+    .preview-actions-bar {
+      width: 100%;
+      margin-top: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
     /* THE EXACT 9:16 PHONE SCREEN CONTAINER */
     #phone-screen {
       width: 432px;
-      height: 768px; /* 432 * 16 / 9 = 768 px -> Strict 9:16 */
+      height: 768px; /* Strict 9:16 aspect ratio (432 * 16 / 9 = 768) */
       aspect-ratio: 9 / 16;
       background: radial-gradient(circle at 100% 85%, rgba(18, 62, 75, 0.45) 0%, transparent 55%),
                   radial-gradient(circle at 95% 30%, rgba(15, 48, 60, 0.35) 0%, transparent 45%),
@@ -581,7 +604,7 @@
 
     .campaign-subtitle {
       font-size: 12px;
-      color: #8b9ca8;
+      color: #8c9ea9;
       display: flex;
       align-items: center;
       gap: 5px;
@@ -712,6 +735,70 @@
       box-shadow: 0 0 0 1.5px #38bdf8;
     }
 
+    /* Download Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(6px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 20px;
+    }
+
+    .modal-card {
+      background: #151d27;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 24px;
+      max-width: 480px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7);
+    }
+
+    .modal-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+
+    .modal-desc {
+      font-size: 0.85rem;
+      color: #94a3b8;
+      margin-bottom: 16px;
+    }
+
+    .modal-preview-img {
+      width: 200px;
+      height: 355px; /* 9:16 aspect preview */
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+      object-fit: contain;
+      margin-bottom: 18px;
+    }
+
+    .modal-buttons {
+      display: flex;
+      width: 100%;
+      gap: 12px;
+    }
+
+    .modal-buttons button, .modal-buttons a {
+      flex: 1;
+      text-decoration: none;
+    }
+
     @media (max-width: 950px) {
       .workspace {
         flex-direction: column;
@@ -729,162 +816,172 @@
 </head>
 <body>
 
-  <!-- App Header -->
+  <!-- App Header Navigation -->
   <header class="app-nav">
     <h1>
       Meta Ads Manager Replica
-      <span class="badge-ratio">Always 9:16 (1080×1920)</span>
+      <span class="badge-ratio">9:16 (1080×1920)</span>
     </h1>
     <div class="nav-actions">
       <button class="btn btn-secondary" onclick="resetToDefaults()">Reset Defaults</button>
-      <button class="btn btn-primary" onclick="generateScreenshot()">
-        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+      <!-- Top Download Button -->
+      <button class="btn btn-primary" onclick="downloadScreenshot()">
+        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
         </svg>
-        Generate 9:16 Screenshot
+        Download Screenshot
       </button>
     </div>
   </header>
 
-  <!-- Workspace -->
+  <!-- Workspace Container -->
   <div class="workspace">
     
     <!-- LEFT: Dashboard Editor Form -->
     <div class="dashboard-panel">
-      <div class="tip-box">
-        💡 <strong>Live Editor:</strong> Type any numbers or text here, or click directly on the canvas preview to edit inline. The exported screenshot is guaranteed to be strictly in <strong>9:16 aspect ratio (1080 × 1920 px)</strong>.
+      <div class="panel-content">
+        <div class="tip-box">
+          💡 <strong>Live Editor:</strong> Modify any value below or click directly on the phone preview. When ready, click <strong>"Download Screenshot"</strong> to save the exact <strong>9:16 (1080×1920 Full HD PNG)</strong>.
+        </div>
+
+        <!-- Android Status Bar Settings -->
+        <div class="section-title">📱 Android Status Bar</div>
+        <div class="grid-3">
+          <div class="form-group">
+            <label>Clock Time</label>
+            <input type="text" id="in-time" value="11:30" oninput="syncFromForm()">
+          </div>
+          <div class="form-group">
+            <label>Network Speed</label>
+            <input type="text" id="in-speed" value="17.8 KB/s" oninput="syncFromForm()">
+          </div>
+          <div class="form-group">
+            <label>Battery %</label>
+            <input type="text" id="in-battery" value="43" oninput="syncFromForm()">
+          </div>
+        </div>
+
+        <!-- Account Settings -->
+        <div class="section-title">👤 Account Header</div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label>Account Name</label>
+            <input type="text" id="in-account-name" value="Shashi Kiran" oninput="syncFromForm()">
+          </div>
+          <div class="form-group">
+            <label>Account Subtitle</label>
+            <input type="text" id="in-account-sub" value="No active campaigns" oninput="syncFromForm()">
+          </div>
+        </div>
+
+        <!-- Spend & Limits Settings -->
+        <div class="section-title">💰 Total Amount Spent & Spending Limit</div>
+        <div class="grid-3">
+          <div class="form-group">
+            <label>Currency Symbol</label>
+            <input type="text" id="in-currency" value="₹" oninput="syncFromForm()">
+          </div>
+          <div class="form-group">
+            <label>Total Amount Spent</label>
+            <input type="text" id="in-total-spent" value="833.64" oninput="syncFromForm()">
+          </div>
+          <div class="form-group">
+            <label>Remaining Limit</label>
+            <input type="text" id="in-remaining-limit" value="13.81" oninput="syncFromForm()">
+          </div>
+        </div>
+
+        <!-- Opportunity Score -->
+        <div class="section-title">🎯 Opportunity Score</div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label>Score Points (out of 100)</label>
+            <input type="number" id="in-opp-score" value="100" min="0" max="100" oninput="syncFromForm()">
+          </div>
+          <div class="form-group">
+            <label>Recommendations Count</label>
+            <input type="number" id="in-opp-rec" value="0" oninput="syncFromForm()">
+          </div>
+        </div>
+
+        <!-- Campaign 1 -->
+        <div class="section-title">📊 Campaign 1 Settings</div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label>Campaign Name</label>
+            <input type="text" id="in-c1-name" value="Puntex" oninput="syncFromForm()">
+          </div>
+          <div class="form-group">
+            <label>Subtitle / Status</label>
+            <input type="text" id="in-c1-sub" value="No Ads Leads" oninput="syncFromForm()">
+          </div>
+        </div>
+        <div class="grid-3">
+          <div class="form-group">
+            <label>Link Clicks</label>
+            <input type="text" id="in-c1-clicks" value="0" oninput="syncFromForm()">
+          </div>
+          <div class="form-group">
+            <label>Cost per Link Click</label>
+            <input type="text" id="in-c1-cpc" value="0.00" oninput="syncFromForm()">
+          </div>
+          <div class="form-group">
+            <label>Spent</label>
+            <input type="text" id="in-c1-spent" value="0.00" oninput="syncFromForm()">
+          </div>
+        </div>
+
+        <!-- Campaign 2 -->
+        <div class="section-title">📊 Campaign 2 Settings</div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label>Campaign Name</label>
+            <input type="text" id="in-c2-name" value="Puntexc Leads campaign" oninput="syncFromForm()">
+          </div>
+          <div class="form-group">
+            <label>Subtitle / Status</label>
+            <input type="text" id="in-c2-sub" value="Off Leads" oninput="syncFromForm()">
+          </div>
+        </div>
+        <div class="grid-3">
+          <div class="form-group">
+            <label>Website Contacts</label>
+            <input type="text" id="in-c2-contacts" value="351" oninput="syncFromForm()">
+          </div>
+          <div class="form-group">
+            <label>Cost per Contact</label>
+            <input type="text" id="in-c2-cpc" value="2.38" oninput="syncFromForm()">
+          </div>
+          <div class="form-group">
+            <label>Spent</label>
+            <input type="text" id="in-c2-spent" value="833.64" oninput="syncFromForm()">
+          </div>
+        </div>
+
+        <!-- Badges -->
+        <div class="section-title">🔔 Badges & Notifications</div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label>Meta AI Floating Badge</label>
+            <input type="text" id="in-ai-badge" value="1" oninput="syncFromForm()">
+          </div>
+        </div>
       </div>
 
-      <!-- Android Status Bar Settings -->
-      <div class="section-title">📱 Android Status Bar</div>
-      <div class="grid-3">
-        <div class="form-group">
-          <label>Clock Time</label>
-          <input type="text" id="in-time" value="11:30" oninput="syncFromForm()">
-        </div>
-        <div class="form-group">
-          <label>Network Speed</label>
-          <input type="text" id="in-speed" value="17.8 KB/s" oninput="syncFromForm()">
-        </div>
-        <div class="form-group">
-          <label>Battery %</label>
-          <input type="text" id="in-battery" value="43" oninput="syncFromForm()">
-        </div>
-      </div>
-
-      <!-- Account Settings -->
-      <div class="section-title">👤 Account Header</div>
-      <div class="grid-2">
-        <div class="form-group">
-          <label>Account Name</label>
-          <input type="text" id="in-account-name" value="Shashi Kiran" oninput="syncFromForm()">
-        </div>
-        <div class="form-group">
-          <label>Account Subtitle</label>
-          <input type="text" id="in-account-sub" value="No active campaigns" oninput="syncFromForm()">
-        </div>
-      </div>
-
-      <!-- Spend & Limits Settings -->
-      <div class="section-title">💰 Total Amount Spent & Spending Limit</div>
-      <div class="grid-3">
-        <div class="form-group">
-          <label>Currency Symbol</label>
-          <input type="text" id="in-currency" value="₹" oninput="syncFromForm()">
-        </div>
-        <div class="form-group">
-          <label>Total Amount Spent</label>
-          <input type="text" id="in-total-spent" value="833.64" oninput="syncFromForm()">
-        </div>
-        <div class="form-group">
-          <label>Remaining Limit</label>
-          <input type="text" id="in-remaining-limit" value="13.81" oninput="syncFromForm()">
-        </div>
-      </div>
-
-      <!-- Opportunity Score -->
-      <div class="section-title">🎯 Opportunity Score</div>
-      <div class="grid-2">
-        <div class="form-group">
-          <label>Score Points (out of 100)</label>
-          <input type="number" id="in-opp-score" value="100" min="0" max="100" oninput="syncFromForm()">
-        </div>
-        <div class="form-group">
-          <label>Recommendations Count</label>
-          <input type="number" id="in-opp-rec" value="0" oninput="syncFromForm()">
-        </div>
-      </div>
-
-      <!-- Campaign 1 -->
-      <div class="section-title">📊 Campaign 1 Settings</div>
-      <div class="grid-2">
-        <div class="form-group">
-          <label>Campaign Name</label>
-          <input type="text" id="in-c1-name" value="Puntex" oninput="syncFromForm()">
-        </div>
-        <div class="form-group">
-          <label>Subtitle / Status</label>
-          <input type="text" id="in-c1-sub" value="No Ads Leads" oninput="syncFromForm()">
-        </div>
-      </div>
-      <div class="grid-3">
-        <div class="form-group">
-          <label>Link Clicks</label>
-          <input type="text" id="in-c1-clicks" value="0" oninput="syncFromForm()">
-        </div>
-        <div class="form-group">
-          <label>Cost per Link Click</label>
-          <input type="text" id="in-c1-cpc" value="0.00" oninput="syncFromForm()">
-        </div>
-        <div class="form-group">
-          <label>Spent</label>
-          <input type="text" id="in-c1-spent" value="0.00" oninput="syncFromForm()">
-        </div>
-      </div>
-
-      <!-- Campaign 2 -->
-      <div class="section-title">📊 Campaign 2 Settings</div>
-      <div class="grid-2">
-        <div class="form-group">
-          <label>Campaign Name</label>
-          <input type="text" id="in-c2-name" value="Puntexc Leads campaign" oninput="syncFromForm()">
-        </div>
-        <div class="form-group">
-          <label>Subtitle / Status</label>
-          <input type="text" id="in-c2-sub" value="Off Leads" oninput="syncFromForm()">
-        </div>
-      </div>
-      <div class="grid-3">
-        <div class="form-group">
-          <label>Website Contacts</label>
-          <input type="text" id="in-c2-contacts" value="351" oninput="syncFromForm()">
-        </div>
-        <div class="form-group">
-          <label>Cost per Contact</label>
-          <input type="text" id="in-c2-cpc" value="2.38" oninput="syncFromForm()">
-        </div>
-        <div class="form-group">
-          <label>Spent</label>
-          <input type="text" id="in-c2-spent" value="833.64" oninput="syncFromForm()">
-        </div>
-      </div>
-
-      <!-- Badges -->
-      <div class="section-title">🔔 Badges & Notifications</div>
-      <div class="grid-2">
-        <div class="form-group">
-          <label>Meta AI Floating Badge</label>
-          <input type="text" id="in-ai-badge" value="1" oninput="syncFromForm()">
-        </div>
-      </div>
+      <!-- Prominent Form-Bottom Download Button -->
+      <button class="btn btn-primary btn-large" onclick="downloadScreenshot()">
+        <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+        </svg>
+        Download Screenshot (9:16 PNG)
+      </button>
     </div>
 
-    <!-- RIGHT: 9:16 Phone Mockup Preview -->
+    <!-- RIGHT: Phone Mockup Preview Panel -->
     <div class="preview-panel">
       <div class="preview-header">
         <span>Preview Frame (9:16)</span>
-        <span style="font-size: 0.75rem; color: #44cf6c;">● Locked 9:16 Aspect</span>
+        <span style="font-size: 0.75rem; color: #44cf6c;">● 1080×1920 HD Ready</span>
       </div>
 
       <!-- EXACT 9:16 PHONE SCREEN -->
@@ -971,7 +1068,7 @@
         <!-- Content Area -->
         <div class="screen-content">
           
-          <!-- Card 1: Spend -->
+          <!-- Spend Card -->
           <div class="meta-card">
             <div class="spend-grid">
               <div>
@@ -992,7 +1089,7 @@
             </div>
           </div>
 
-          <!-- Card 2: Opportunity Score -->
+          <!-- Opportunity Score Card -->
           <div class="meta-card opportunity-card">
             <div class="opp-header">
               <div class="card-label" style="margin-bottom:0;">Opportunity score</div>
@@ -1152,10 +1249,41 @@
         </div>
 
       </div>
+
+      <!-- Preview Panel Direct Download Action -->
+      <div class="preview-actions-bar">
+        <button class="btn btn-primary" style="width: 100%;" onclick="downloadScreenshot()">
+          <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+          </svg>
+          Download Screenshot (1080×1920)
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Download Complete Preview Modal -->
+  <div class="modal-overlay" id="downloadModal">
+    <div class="modal-card">
+      <div class="modal-title">🎉 Screenshot Ready!</div>
+      <div class="modal-desc">Your 9:16 high-resolution screenshot (1080×1920) has been generated.</div>
+      
+      <img id="modalPreviewImg" class="modal-preview-img" alt="Screenshot Preview">
+      
+      <div class="modal-buttons">
+        <button class="btn btn-secondary" onclick="closeModal()">Close</button>
+        <a id="modalDownloadBtn" class="btn btn-primary" download="screenshot.png">
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+          </svg>
+          Download PNG
+        </a>
+      </div>
     </div>
   </div>
 
   <script>
+    // Two-way sync functions
     function syncFromForm() {
       document.getElementById('ui-time').innerText = document.getElementById('in-time').value;
       document.getElementById('ui-speed').innerText = document.getElementById('in-speed').value;
@@ -1246,18 +1374,21 @@
       syncFromForm();
     }
 
-    // STRICT 9:16 (1080 x 1920) SCREENSHOT GENERATOR
-    async function generateScreenshot() {
+    function closeModal() {
+      document.getElementById('downloadModal').style.display = 'none';
+    }
+
+    // STRICT 9:16 (1080 x 1920) SCREENSHOT DOWNLOAD ENGINE
+    async function downloadScreenshot() {
       const phoneElement = document.getElementById('phone-screen');
       const originalRadius = phoneElement.style.borderRadius;
       phoneElement.style.borderRadius = "0px";
 
       // Fixed 9:16 target dimensions
       const TARGET_WIDTH = 1080;
-      const TARGET_HEIGHT = 1920; // Exact 9:16 aspect ratio
+      const TARGET_HEIGHT = 1920;
 
       try {
-        // Render html2canvas with scaled factor
         const renderedCanvas = await html2canvas(phoneElement, {
           width: phoneElement.offsetWidth,
           height: phoneElement.offsetHeight,
@@ -1267,7 +1398,7 @@
           logging: false
         });
 
-        // Enforce exact 1080x1920 canvas export
+        // Create clean 1080 x 1920 canvas
         const finalCanvas = document.createElement('canvas');
         finalCanvas.width = TARGET_WIDTH;
         finalCanvas.height = TARGET_HEIGHT;
@@ -1277,15 +1408,27 @@
         ctx.fillRect(0, 0, TARGET_WIDTH, TARGET_HEIGHT);
         ctx.drawImage(renderedCanvas, 0, 0, TARGET_WIDTH, TARGET_HEIGHT);
 
-        // Download PNG
         const imageURL = finalCanvas.toDataURL('image/png');
+        const filename = `Meta_Ads_9x16_${Date.now()}.png`;
+
+        // 1. Direct automatic download trigger
         const link = document.createElement('a');
-        link.download = `Meta_Ads_9x16_${Date.now()}.png`;
+        link.download = filename;
         link.href = imageURL;
+        document.body.appendChild(link);
         link.click();
+        document.body.removeChild(link);
+
+        // 2. Also open preview modal with secondary download button (ensures 100% mobile compatibility)
+        document.getElementById('modalPreviewImg').src = imageURL;
+        const modalBtn = document.getElementById('modalDownloadBtn');
+        modalBtn.href = imageURL;
+        modalBtn.download = filename;
+        document.getElementById('downloadModal').style.display = 'flex';
+
       } catch (err) {
-        console.error('Screenshot generation failed:', err);
-        alert('Could not generate screenshot. Please check browser permissions.');
+        console.error('Download failed:', err);
+        alert('Could not download screenshot. Please try again.');
       } finally {
         phoneElement.style.borderRadius = originalRadius;
       }
