@@ -1,0 +1,1628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#202933">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Meta Ads Manager</title>
+
+  <!-- Google Fonts: Roboto & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&family=Inter:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <!-- html2canvas -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100dvh;
+      overflow: hidden;
+      background-color: #0b0f14;
+      font-family: 'Roboto', sans-serif;
+      user-select: none;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Fixed Mobile Shell Wrapper */
+    .mobile-app-shell {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #0b0f14;
+      overflow: hidden;
+    }
+
+    /* =========================================================
+       FIXED MOBILE APPLICATION SCREEN (9:16 Lock & Full-Bleed Mobile)
+       ========================================================= */
+    #phone-screen {
+      width: 100%;
+      height: 100dvh;
+      max-width: 432px;
+      max-height: 768px;
+      /* Exact Slate-Teal Dark Gradient from Screenshot */
+      background:
+        radial-gradient(circle at 92% 62%, rgba(23, 62, 74, 0.55) 0%, transparent 48%),
+        radial-gradient(circle at 88% 28%, rgba(22, 55, 68, 0.45) 0%, transparent 45%),
+        linear-gradient(180deg, #202933 0%, #1d2731 35%, #1a2631 70%, #1c2732 100%);
+      color: #ffffff;
+      font-family: 'Roboto', sans-serif;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9);
+    }
+
+    /* Full-bleed native fit on actual phones */
+    @media (max-width: 480px) {
+      #phone-screen {
+        max-width: 100vw;
+        max-height: 100dvh;
+        width: 100vw;
+        height: 100dvh;
+        box-shadow: none;
+      }
+    }
+
+    /*Strict 432x768 lock class used automatically during 1080x1920 PNG export*/
+    #phone-screen.export-lock {
+      width: 432px !important;
+      height: 768px !important;
+      max-width: 432px !important;
+      max-height: 768px !important;
+    }
+
+    /* 1. ANDROID STATUS BAR */
+    .status-bar {
+      height: 34px;
+      padding: 6px 18px 0 22px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #ffffff;
+      flex-shrink: 0;
+    }
+
+    .status-left {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13.5px;
+      font-weight: 500;
+      letter-spacing: 0.2px;
+    }
+
+    .status-right {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .speed-stack {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      line-height: 0.95;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .speed-num {
+      font-size: 8.5px;
+    }
+
+    .speed-unit {
+      font-size: 7.5px;
+      letter-spacing: -0.2px;
+    }
+
+    .vo5g-pill {
+      background: #ffffff;
+      color: #1c2630;
+      font-size: 8.5px;
+      font-weight: 800;
+      padding: 1.5px 3.5px;
+      border-radius: 2.5px;
+      line-height: 1;
+      letter-spacing: -0.2px;
+    }
+
+    .sig-cluster {
+      display: flex;
+      align-items: flex-end;
+      gap: 1px;
+      position: relative;
+      padding-top: 4px;
+    }
+
+    .sig-5g-label {
+      position: absolute;
+      top: -2px;
+      left: 0;
+      font-size: 7.5px;
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: -0.3px;
+    }
+
+    .battery-pill {
+      width: 24px;
+      height: 13px;
+      border-radius: 3.5px;
+      background: rgba(255, 255, 255, 0.32);
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      margin-left: 2px;
+    }
+
+    .battery-fill {
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 48%;
+      background: rgba(255, 255, 255, 0.45);
+    }
+
+    .battery-text {
+      position: relative;
+      z-index: 2;
+      font-size: 9.5px;
+      font-weight: 800;
+      color: #ffffff;
+      line-height: 1;
+    }
+
+    /* 2. HEADER BAR */
+    .header-bar {
+      padding: 10px 18px 12px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .account-block {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .gear-avatar {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      background: #354551;
+      border: 1.5px solid #5a6b77;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      cursor: pointer;
+    }
+
+    .account-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .account-title-row {
+      display: flex;
+      align-items: center;
+      gap: 34px;
+    }
+
+    .account-name {
+      font-size: 20.5px;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: 0.1px;
+    }
+
+    .account-subtitle {
+      font-size: 13px;
+      color: #9ba8b2;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      margin-top: 2px;
+    }
+
+    .status-dot-grey {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background-color: #6d7d88;
+      display: inline-block;
+    }
+
+    .header-right-actions {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .bell-btn {
+      background: none;
+      border: none;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .plus-circle-btn {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      background-color: #53b770;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      cursor: pointer;
+    }
+
+    /* 3. FILTER / DATE / STATUS ROW */
+    .filter-chips-row {
+      padding: 0 18px 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 9px;
+      flex-shrink: 0;
+    }
+
+    .filter-icon-chip {
+      width: 52px;
+      height: 42px;
+      background: #354551;
+      border: 1px solid #687985;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+    }
+
+    .dropdown-chip {
+      height: 42px;
+      background: #354551;
+      border: 1px solid #687985;
+      border-radius: 4px;
+      padding: 0 16px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      font-size: 16.5px;
+      font-weight: 400;
+      color: #f1f5f9;
+    }
+
+    /* 4. MAIN CARDS AREA */
+    .screen-content {
+      flex: 1;
+      padding: 0 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 11px;
+      overflow: hidden;
+    }
+
+    .meta-card {
+      background: #17202a;
+      border-radius: 5px;
+      padding: 15px 16px;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.015);
+    }
+
+    /* Card 1: Total amount spent & Spending limit */
+    .spend-grid {
+      display: grid;
+      grid-template-columns: 48% 52%;
+      position: relative;
+    }
+
+    .card-chevron {
+      position: absolute;
+      top: 1px;
+      right: 0;
+      color: #dbe4eb;
+    }
+
+    .card-label {
+      font-size: 13.5px;
+      color: #96a4ae;
+      font-weight: 400;
+      margin-bottom: 5px;
+    }
+
+    .spend-amount {
+      font-size: 21.5px;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: 0.1px;
+    }
+
+    .spend-limit-value {
+      font-size: 13.5px;
+      font-weight: 500;
+      color: #e25a5a;
+      margin-top: 8px;
+    }
+
+    /* Card 2: Opportunity score */
+    .opportunity-card {
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+      padding: 14px 16px 15px 16px;
+    }
+
+    .opp-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .opp-body {
+      display: grid;
+      grid-template-columns: 54% 46%;
+      align-items: center;
+    }
+
+    .score-metric {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+
+    .gauge-wrap {
+      width: 38px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .opp-big-val {
+      font-size: 21.5px;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .opp-sub-label {
+      font-size: 13px;
+      color: #96a4ae;
+      margin-left: 3px;
+    }
+
+    /* Campaigns Section Title */
+    .campaigns-section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 6px;
+      margin-bottom: 2px;
+      padding: 0 1px;
+    }
+
+    .campaigns-section-title {
+      font-size: 20.5px;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: 0.1px;
+    }
+
+    /* Campaign Cards */
+    .campaign-card {
+      background: #17202a;
+      border-radius: 5px;
+      padding: 15px 16px 16px 16px;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.015);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .campaign-header-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+    }
+
+    .campaign-left-group {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .c1-indent {
+      padding-left: 8px;
+    }
+
+    .ad-thumb-wrap {
+      width: 44px;
+      height: 44px;
+      position: relative;
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+
+    .ad-thumb-img-box {
+      width: 44px;
+      height: 44px;
+      border-radius: 6px;
+      overflow: hidden;
+      background: #0d1b2a;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .ad-thumb-img-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .thumb-status-dot {
+      position: absolute;
+      bottom: -2px;
+      right: -2px;
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      background: #6c7c87;
+      border: 2px solid #17202a;
+    }
+
+    .campaign-title {
+      font-size: 16px;
+      font-weight: 500;
+      color: #ffffff;
+      line-height: 1.25;
+      margin-bottom: 3px;
+    }
+
+    .campaign-subtitle {
+      font-size: 13px;
+      color: #96a4ae;
+      font-weight: 400;
+    }
+
+    .dots-btn {
+      color: #e2e8f0;
+      margin-top: 2px;
+      cursor: pointer;
+    }
+
+    /* 3-Column Campaign Metrics */
+    .campaign-metrics-grid {
+      display: grid;
+      grid-template-columns: 33% 37% 30%;
+      align-items: stretch;
+    }
+
+    .metric-column {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+    }
+
+    .metric-column:not(:first-child) {
+      border-left: 1px solid #323e4a;
+      padding-left: 12px;
+    }
+
+    .metric-num {
+      font-size: 17.5px;
+      font-weight: 700;
+      color: #ffffff;
+      line-height: 1.2;
+      margin-bottom: 3px;
+    }
+
+    .metric-text {
+      font-size: 12.5px;
+      color: #96a4ae;
+      line-height: 1.3;
+      white-space: pre-line;
+    }
+
+    /* 5. FLOATING FLOWER ACTION BUTTON */
+    .floating-meta-btn {
+      position: absolute;
+      bottom: 66px;
+      right: 18px;
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      background: #1b2530;
+      border: 1.5px solid #485664;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 20;
+      cursor: pointer;
+    }
+
+    .meta-badge {
+      position: absolute;
+      top: -3px;
+      right: -2px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #e53935;
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* 6. BOTTOM NAVIGATION BAR */
+    .bottom-navbar {
+      height: 54px;
+      background: #19232d;
+      border-top: 1px solid #283440;
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      padding: 0 12px 6px 12px;
+      flex-shrink: 0;
+      position: relative;
+      margin-top: auto;
+    }
+
+    .nav-icon-link {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      color: #ffffff;
+      cursor: pointer;
+    }
+
+    /* Android Gesture Bar */
+    .android-home-pill {
+      position: absolute;
+      bottom: 4px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 128px;
+      height: 3.5px;
+      background: #ffffff;
+      border-radius: 3px;
+    }
+
+    /* Inline Contenteditable Styling */
+    [contenteditable="true"] {
+      outline: none;
+      border-radius: 2px;
+      user-select: text;
+    }
+
+    [contenteditable="true"]:focus {
+      background: rgba(56, 189, 248, 0.2);
+      box-shadow: 0 0 0 1px #38bdf8;
+    }
+
+    /* =========================================================
+       MOBILE STUDIO BOTTOM-SHEET DRAWER & FLOATING PILL
+       (Ignored automatically by html2canvas)
+       ========================================================= */
+    .floating-studio-pill {
+      position: fixed;
+      bottom: 64px;
+      left: 16px;
+      z-index: 90;
+      background: rgba(15, 23, 34, 0.92);
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      color: #f8fafc;
+      border-radius: 999px;
+      padding: 7px 13px;
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(8px);
+      cursor: pointer;
+      transition: transform 0.2s ease, opacity 0.2s ease;
+    }
+
+    .floating-studio-pill.hidden-pill {
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(10px);
+    }
+
+    .drawer-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(3px);
+      z-index: 200;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+
+    .drawer-backdrop.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .bottom-sheet {
+      position: fixed;
+      left: 50%;
+      bottom: 0;
+      transform: translate(-50%, 100%);
+      width: 100%;
+      max-width: 480px;
+      max-height: 86dvh;
+      background: #131b24;
+      border-top: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 20px 20px 0 0;
+      z-index: 210;
+      display: flex;
+      flex-direction: column;
+      font-family: 'Inter', sans-serif;
+      transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.3, 1);
+      box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.75);
+    }
+
+    .bottom-sheet.open {
+      transform: translate(-50%, 0);
+    }
+
+    .sheet-handle-bar {
+      padding: 10px 18px 8px 18px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      flex-shrink: 0;
+    }
+
+    .sheet-pill {
+      width: 42px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.25);
+      border-radius: 99px;
+      margin-bottom: 10px;
+    }
+
+    .sheet-top-row {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .sheet-title {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .sheet-close-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: none;
+      color: #cbd5e1;
+      padding: 5px 11px;
+      border-radius: 6px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .sheet-body {
+      padding: 14px 18px 24px 18px;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .quick-actions-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .btn {
+      cursor: pointer;
+      border: none;
+      border-radius: 8px;
+      padding: 11px 14px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+
+    .btn-secondary {
+      background: #1e293b;
+      color: #e2e8f0;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .btn-full {
+      width: 100%;
+      padding: 13px;
+      font-size: 0.9rem;
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #38bdf8;
+      font-weight: 700;
+      margin: 14px 0 8px 0;
+      padding-bottom: 4px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+    }
+
+    .form-group {
+      margin-bottom: 9px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.72rem;
+      color: #94a3b8;
+      margin-bottom: 3px;
+      font-weight: 500;
+    }
+
+    .form-group input {
+      width: 100%;
+      background: #0b111a;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 6px;
+      padding: 8px 10px;
+      color: #fff;
+      font-size: 0.82rem;
+      outline: none;
+    }
+
+    .form-group input:focus {
+      border-color: #38bdf8;
+    }
+
+    /* Modal Popup */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.88);
+      backdrop-filter: blur(5px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 18px;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .modal-card {
+      background: #151d27;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 14px;
+      padding: 20px;
+      max-width: 380px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .modal-preview-img {
+      width: 180px;
+      height: 320px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      margin: 12px 0 16px 0;
+      object-fit: contain;
+    }
+
+    .modal-buttons {
+      display: flex;
+      width: 100%;
+      gap: 10px;
+    }
+
+    .modal-buttons button,
+    .modal-buttons a {
+      flex: 1;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="mobile-app-shell">
+    <!-- =========================================================
+         EXACT 9:16 MOBILE SCREEN
+         ========================================================= -->
+    <div id="phone-screen">
+
+      <!-- 1. STATUS BAR -->
+      <div class="status-bar" id="app-status-bar">
+        <div class="status-left">
+          <span id="ui-time" contenteditable="true" oninput="syncToForm()">11:30</span>
+          <!-- White circular loop/share notification icon -->
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm3.5 13.5c-1.1 0-2.05-.55-2.65-1.4l-1.7 1.7c-.6.6-1.55.6-2.15 0-.6-.6-.6-1.55 0-2.15l2.5-2.5c.6-.6 1.55-.6 2.15 0l1.1 1.1c.35-.35.85-.55 1.4-.55 1.1 0 2 .9 2 2s-.9 1.8-2.65 1.8zm-7-7c1.1 0 2.05.55 2.65 1.4l1.7-1.7c.6-.6 1.55-.6 2.15 0 .6.6.6 1.55 0 2.15l-2.5 2.5c-.6.6-1.55.6-2.15 0l-1.1-1.1c-.35.35-.85.55-1.4.55-1.1 0-2-.9-2-2s.9-1.8 2.65-1.8z"/>
+          </svg>
+        </div>
+
+        <div class="status-right">
+          <!-- Muted Bell Icon -->
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M20 18.69L7.84 6.14 5.27 3.49 4 4.76l2.8 2.8v.01c-.52.99-.8 2.16-.8 3.42v5l-2 2v1h13.73l2 2L21 19.72l-1-1.03zM12 22c1.11 0 2-.89 2-2h-4c0 1.11.89 2 2 2zm6-7.32V11c0-3.08-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68c-.15.03-.29.08-.42.12-.1.03-.2.07-.3.11h-.01c-.01 0-.01 0-.02.01-.23.09-.46.2-.68.31 0 0-.01 0-.01.01L18 14.68z"/>
+          </svg>
+
+          <!-- Stacked 17.8 / KB/S -->
+          <div class="speed-stack">
+            <span class="speed-num" id="ui-speed" contenteditable="true" oninput="syncToForm()">17.8</span>
+            <span class="speed-unit">KB/S</span>
+          </div>
+
+          <!-- Crescent Moon -->
+          <svg width="12.5" height="12.5" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 0 1-4.4 2.26 5.403 5.403 0 0 1-3.14-9.8c-.44-.06-.9-.1-1.36-.1z"/>
+          </svg>
+
+          <!-- Solid White Vo5G Badge -->
+          <span class="vo5g-pill">Vo5G</span>
+
+          <!-- 5G + Signal Bars -->
+          <div class="sig-cluster">
+            <span class="sig-5g-label">5G</span>
+            <svg width="16" height="12" viewBox="0 0 18 14" fill="currentColor">
+              <rect x="1" y="9" width="2.2" height="4" rx="0.6"/>
+              <rect x="4.5" y="7" width="2.2" height="6" rx="0.6"/>
+              <rect x="8" y="4.5" width="2.2" height="8.5" rx="0.6"/>
+              <rect x="11.5" y="2" width="2.2" height="11" rx="0.6" opacity="0.4"/>
+              <rect x="15" y="4" width="1.8" height="9" rx="0.5"/>
+            </svg>
+          </div>
+
+          <!-- Battery Pill with 43 -->
+          <div class="battery-pill">
+            <div class="battery-fill" id="ui-battery-fill"></div>
+            <span class="battery-text" id="ui-battery" contenteditable="true" oninput="syncToForm()">43</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. ACCOUNT HEADER -->
+      <div class="header-bar">
+        <div class="account-block">
+          <div class="gear-avatar" onclick="toggleDrawer(true)" title="Open App Controls">
+            <!-- Exact 8-Tooth Settings Gear Outline -->
+            <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+          </div>
+          <div class="account-info">
+            <div class="account-title-row">
+              <span class="account-name" id="ui-account-name" contenteditable="true" oninput="syncToForm()">Shashi Kiran</span>
+              <svg width="12" height="8" viewBox="0 0 12 8" fill="#ffffff">
+                <path d="M1.41 0.59L6 5.17L10.59 0.59C11.22 -0.04 12.29 0.41 11.66 1.04L6.71 6.71C6.32 7.1 5.68 7.1 5.29 6.71L0.34 1.04C-0.29 0.41 0.78 -0.04 1.41 0.59Z"/>
+              </svg>
+            </div>
+            <div class="account-subtitle">
+              <span class="status-dot-grey"></span>
+              <span id="ui-account-sub" contenteditable="true" oninput="syncToForm()">No active campaigns</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="header-right-actions">
+          <button class="bell-btn" onclick="downloadScreenshot()" title="Quick Save 9:16 PNG">
+            <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+            </svg>
+          </button>
+          <button class="plus-circle-btn" onclick="toggleDrawer(true)" title="Edit Metrics">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- 3. FILTER / DATE / STATUS CHIPS -->
+      <div class="filter-chips-row">
+        <div class="filter-icon-chip">
+          <svg width="16" height="12" viewBox="0 0 18 12" fill="#ffffff">
+            <rect x="0" y="0" width="18" height="2" rx="1"/>
+            <rect x="3" y="5" width="12" height="2" rx="1"/>
+            <rect x="7" y="10" width="4" height="2" rx="1"/>
+          </svg>
+        </div>
+
+        <div class="dropdown-chip">
+          <span id="ui-date-label" contenteditable="true" oninput="syncToForm()">Date</span>
+          <svg width="11" height="7" viewBox="0 0 12 8" fill="#ffffff">
+            <path d="M1.2 1.2L6 6.2L10.8 1.2C11.3 0.7 11 0 10.2 0H1.8C1 0 0.7 0.7 1.2 1.2Z"/>
+          </svg>
+        </div>
+
+        <div class="dropdown-chip">
+          <span id="ui-status-label" contenteditable="true" oninput="syncToForm()">Status</span>
+          <svg width="11" height="7" viewBox="0 0 12 8" fill="#ffffff">
+            <path d="M1.2 1.2L6 6.2L10.8 1.2C11.3 0.7 11 0 10.2 0H1.8C1 0 0.7 0.7 1.2 1.2Z"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- 4. MAIN CARDS -->
+      <div class="screen-content">
+
+        <!-- Card 1: Total amount spent -->
+        <div class="meta-card">
+          <div class="spend-grid">
+            <div>
+              <div class="card-label">Total amount spent</div>
+              <div class="spend-amount">
+                <span class="ui-currency">₹</span><span id="ui-total-spent" contenteditable="true" oninput="syncToForm()">833.64</span>
+              </div>
+            </div>
+            <div>
+              <div class="card-label">Spending limit</div>
+              <div class="spend-limit-value">
+                <span class="ui-currency">₹</span><span id="ui-remaining-limit" contenteditable="true" oninput="syncToForm()">13.81 remaining</span>
+              </div>
+            </div>
+            <svg class="card-chevron" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Card 2: Opportunity score -->
+        <div class="meta-card opportunity-card">
+          <div class="opp-header">
+            <div class="card-label" style="margin-bottom:0;">Opportunity score</div>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#dbe4eb" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </div>
+          <div class="opp-body">
+            <div class="score-metric">
+              <div class="gauge-wrap">
+                <!-- Open-bottom horseshoe gauge (∩) -->
+                <svg width="38" height="34" viewBox="0 0 40 36">
+                  <path d="M 7 29 A 15 15 0 1 1 33 29" fill="none" stroke="rgba(0, 149, 255, 0.2)" stroke-width="4.8" stroke-linecap="round"/>
+                  <path id="ui-opp-gauge" d="M 7 29 A 15 15 0 1 1 33 29" fill="none" stroke="#0095ff" stroke-width="4.8" stroke-linecap="round" stroke-dasharray="68" stroke-dashoffset="0"/>
+                </svg>
+              </div>
+              <div>
+                <span class="opp-big-val" id="ui-opp-score" contenteditable="true" oninput="syncToForm()">100</span>
+                <span class="opp-sub-label">points</span>
+              </div>
+            </div>
+            <div>
+              <span class="opp-big-val" id="ui-opp-rec" contenteditable="true" oninput="syncToForm()">0</span>
+              <span class="opp-sub-label">recommendations</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section Header: Campaigns -->
+        <div class="campaigns-section-header">
+          <span class="campaigns-section-title">Campaigns</span>
+          <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.9" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="16" rx="1.5"></rect>
+            <line x1="3" y1="9" x2="21" y2="9"></line>
+            <line x1="3" y1="14.5" x2="21" y2="14.5"></line>
+            <line x1="9" y1="9" x2="9" y2="20"></line>
+            <line x1="15" y1="9" x2="15" y2="20"></line>
+          </svg>
+        </div>
+
+        <!-- Campaign 1: Puntex -->
+        <div class="campaign-card">
+          <div class="campaign-header-row">
+            <div class="c1-indent">
+              <div class="campaign-title" id="ui-c1-name" contenteditable="true" oninput="syncToForm()">Puntex</div>
+              <div class="campaign-subtitle" id="ui-c1-sub" contenteditable="true" oninput="syncToForm()">No Ads Leads</div>
+            </div>
+            <svg class="dots-btn" onclick="toggleDrawer(true)" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <circle cx="12" cy="5.5" r="1.8"></circle>
+              <circle cx="12" cy="12" r="1.8"></circle>
+              <circle cx="12" cy="18.5" r="1.8"></circle>
+            </svg>
+          </div>
+
+          <div class="campaign-metrics-grid">
+            <div class="metric-column">
+              <div class="metric-num" id="ui-c1-clicks" contenteditable="true" oninput="syncToForm()">0</div>
+              <div class="metric-text">Link clicks</div>
+            </div>
+            <div class="metric-column">
+              <div class="metric-num"><span class="ui-currency">₹</span><span id="ui-c1-cpc" contenteditable="true" oninput="syncToForm()">0.00</span></div>
+              <div class="metric-text">Cost per Link Click</div>
+            </div>
+            <div class="metric-column">
+              <div class="metric-num"><span class="ui-currency">₹</span><span id="ui-c1-spent" contenteditable="true" oninput="syncToForm()">0.00</span></div>
+              <div class="metric-text">Spent</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Campaign 2: Puntexc Leads campaign -->
+        <div class="campaign-card">
+          <div class="campaign-header-row">
+            <div class="campaign-left-group">
+              <div class="ad-thumb-wrap" onclick="document.getElementById('in-thumb-file').click()" title="Tap to change thumbnail">
+                <div class="ad-thumb-img-box" id="thumb-container">
+                  <!-- Detailed SVG Poster Matching "PUNTER LIVE CRICKET UPDATES" -->
+                  <svg width="44" height="44" viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                      <linearGradient id="posterBg" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stop-color="#0d254c"/>
+                        <stop offset="60%" stop-color="#143a66"/>
+                        <stop offset="100%" stop-color="#1e5128"/>
+                      </linearGradient>
+                    </defs>
+                    <rect width="44" height="44" fill="url(#posterBg)"/>
+                    <rect x="4" y="3" width="22" height="5" rx="1" fill="#ffffff"/>
+                    <text x="6" y="7" fill="#0d254c" font-size="4.2" font-weight="bold" font-family="Arial">PUNTER</text>
+                    <rect x="3" y="10" width="12" height="24" rx="1.5" fill="#091526" stroke="#4895ef" stroke-width="0.8"/>
+                    <rect x="4.5" y="13" width="9" height="4" fill="#1d3557"/>
+                    <rect x="4.5" y="18" width="9" height="4" fill="#1d3557"/>
+                    <rect x="4.5" y="23" width="9" height="4" fill="#1d3557"/>
+                    <text x="17" y="14" fill="#ffffff" font-size="4" font-weight="bold" font-family="Arial">LIVE CRICKET</text>
+                    <text x="17" y="19.5" fill="#ffd60a" font-size="5" font-weight="bold" font-family="Arial">UPDATES</text>
+                    <rect x="17" y="22" width="23" height="4" rx="1" fill="#ffd60a"/>
+                    <path d="M0 35 Q22 32 44 36 L44 44 L0 44 Z" fill="#38b000"/>
+                    <circle cx="14" cy="38" r="2.2" fill="#e63946"/>
+                  </svg>
+                </div>
+                <div class="thumb-status-dot"></div>
+              </div>
+              <div>
+                <div class="campaign-title" id="ui-c2-name" contenteditable="true" oninput="syncToForm()">Puntexc Leads campaign</div>
+                <div class="campaign-subtitle" id="ui-c2-sub" contenteditable="true" oninput="syncToForm()">Off Leads</div>
+              </div>
+            </div>
+
+            <svg class="dots-btn" onclick="toggleDrawer(true)" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <circle cx="12" cy="5.5" r="1.8"></circle>
+              <circle cx="12" cy="12" r="1.8"></circle>
+              <circle cx="12" cy="18.5" r="1.8"></circle>
+            </svg>
+          </div>
+
+          <div class="campaign-metrics-grid">
+            <div class="metric-column">
+              <div class="metric-num" id="ui-c2-contacts" contenteditable="true" oninput="syncToForm()">351</div>
+              <div class="metric-text">Website Contacts</div>
+            </div>
+            <div class="metric-column">
+              <div class="metric-num"><span class="ui-currency">₹</span><span id="ui-c2-cpc" contenteditable="true" oninput="syncToForm()">2.38</span></div>
+              <div class="metric-text">Cost per Website Contact</div>
+            </div>
+            <div class="metric-column">
+              <div class="metric-num"><span class="ui-currency">₹</span><span id="ui-c2-spent" contenteditable="true" oninput="syncToForm()">833.64</span></div>
+              <div class="metric-text">Spent</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- 5. FLOATING PURPLE/BLUE PETAL BUTTON -->
+      <div class="floating-meta-btn" onclick="toggleDrawer(true)">
+        <svg width="30" height="30" viewBox="0 0 36 36">
+          <g transform="translate(18,18)">
+            <ellipse cx="0" cy="-8.5" rx="3.2" ry="4.8" transform="rotate(0) rotate(25, 0, -8.5)" fill="#a855f7"/>
+            <ellipse cx="0" cy="-8.5" rx="3.2" ry="4.8" transform="rotate(51.4) rotate(25, 0, -8.5)" fill="#9333ea"/>
+            <ellipse cx="0" cy="-8.5" rx="3.2" ry="4.8" transform="rotate(102.8) rotate(25, 0, -8.5)" fill="#7e22ce"/>
+            <ellipse cx="0" cy="-8.5" rx="3.2" ry="4.8" transform="rotate(154.2) rotate(25, 0, -8.5)" fill="#6366f1"/>
+            <ellipse cx="0" cy="-8.5" rx="3.2" ry="4.8" transform="rotate(205.7) rotate(25, 0, -8.5)" fill="#4f46e5"/>
+            <ellipse cx="0" cy="-8.5" rx="3.2" ry="4.8" transform="rotate(257.1) rotate(25, 0, -8.5)" fill="#8b5cf6"/>
+            <ellipse cx="0" cy="-8.5" rx="3.2" ry="4.8" transform="rotate(308.5) rotate(25, 0, -8.5)" fill="#c084fc"/>
+          </g>
+        </svg>
+        <span class="meta-badge" id="ui-ai-badge" contenteditable="true" onclick="event.stopPropagation()" oninput="syncToForm()">1</span>
+      </div>
+
+      <!-- 6. BOTTOM NAVIGATION BAR -->
+      <div class="bottom-navbar">
+        <!-- Home Icon -->
+        <div class="nav-icon-link">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="#ffffff">
+            <path d="M12 3L4 9.5V20a1 1 0 0 0 1 1h4.5v-5.5a2.5 2.5 0 0 1 5 0V21H19a1 1 0 0 0 1-1V9.5L12 3z"/>
+          </svg>
+        </div>
+
+        <!-- Lightbulb Icon -->
+        <div class="nav-icon-link">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 18h6"></path>
+            <path d="M10 21h4"></path>
+            <path d="M12 18v-5"></path>
+            <circle cx="12" cy="11" r="1.5"></circle>
+            <path d="M12 3a6.5 6.5 0 0 0-4.2 11.4c.7.6 1.2 1.4 1.2 2.3V18h6v-1.3c0-.9.5-1.7 1.2-2.3A6.5 6.5 0 0 0 12 3z"></path>
+          </svg>
+        </div>
+
+        <!-- Search Magnifying Glass -->
+        <div class="nav-icon-link" onclick="downloadScreenshot()" title="Download 9:16 PNG">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round">
+            <circle cx="10.5" cy="10.5" r="7"></circle>
+            <line x1="15.8" y1="15.8" x2="21" y2="21"></line>
+          </svg>
+        </div>
+
+        <!-- Hamburger Menu (Opens Control Drawer) -->
+        <div class="nav-icon-link" onclick="toggleDrawer(true)" title="Open App Controls">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.1" stroke-linecap="round">
+            <line x1="3" y1="6.5" x2="21" y2="6.5"></line>
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="17.5" x2="21" y2="17.5"></line>
+          </svg>
+        </div>
+
+        <!-- Android Bottom White Gesture Pill -->
+        <div class="android-home-pill" id="app-gesture-pill"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FLOATING STUDIO PILL (Auto-ignored in screenshots) -->
+  <div class="floating-studio-pill" id="studioPill" data-html2canvas-ignore="true" onclick="toggleDrawer(true)">
+    <span>⚙️ Edit / Save 9:16</span>
+  </div>
+
+  <!-- SLIDE-UP MOBILE DRAWER BACKDROP -->
+  <div class="drawer-backdrop" id="drawerBackdrop" data-html2canvas-ignore="true" onclick="toggleDrawer(false)"></div>
+
+  <!-- SLIDE-UP MOBILE EDITOR & EXPORT DRAWER -->
+  <div class="bottom-sheet" id="editorDrawer" data-html2canvas-ignore="true">
+    <div class="sheet-handle-bar">
+      <div class="sheet-pill"></div>
+      <div class="sheet-top-row">
+        <div class="sheet-title">
+          <span>📱 App Studio & 9:16 Export</span>
+        </div>
+        <button class="sheet-close-btn" onclick="toggleDrawer(false)">Done</button>
+      </div>
+    </div>
+
+    <div class="sheet-body">
+      <button class="btn btn-primary btn-full" onclick="downloadScreenshot()">
+        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+        </svg>
+        Download 9:16 Screenshot (1080×1920 PNG)
+      </button>
+
+      <div class="quick-actions-grid">
+        <button class="btn btn-secondary" onclick="toggleNativePhoneMode()">
+          <span id="statusToggleText">Hide Fake Status Bar</span>
+        </button>
+        <button class="btn btn-secondary" onclick="hideFloatingPill()">
+          Hide Floating Pill
+        </button>
+      </div>
+
+      <div class="section-title">👤 Account & Total Spend</div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label>Account Name</label>
+          <input type="text" id="in-account-name" value="Shashi Kiran" oninput="syncFromForm()">
+        </div>
+        <div class="form-group">
+          <label>Account Subtitle</label>
+          <input type="text" id="in-account-sub" value="No active campaigns" oninput="syncFromForm()">
+        </div>
+      </div>
+
+      <div class="grid-3">
+        <div class="form-group">
+          <label>Currency</label>
+          <input type="text" id="in-currency" value="₹" oninput="syncFromForm()">
+        </div>
+        <div class="form-group">
+          <label>Total Spent</label>
+          <input type="text" id="in-total-spent" value="833.64" oninput="syncFromForm()">
+        </div>
+        <div class="form-group">
+          <label>Remaining Limit</label>
+          <input type="text" id="in-remaining-limit" value="13.81 remaining" oninput="syncFromForm()">
+        </div>
+      </div>
+
+      <div class="section-title">📊 Campaign 1</div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label>Campaign Name</label>
+          <input type="text" id="in-c1-name" value="Puntex" oninput="syncFromForm()">
+        </div>
+        <div class="form-group">
+          <label>Status Subtitle</label>
+          <input type="text" id="in-c1-sub" value="No Ads Leads" oninput="syncFromForm()">
+        </div>
+      </div>
+      <div class="grid-3">
+        <div class="form-group">
+          <label>Link Clicks</label>
+          <input type="text" id="in-c1-clicks" value="0" oninput="syncFromForm()">
+        </div>
+        <div class="form-group">
+          <label>Cost per Click</label>
+          <input type="text" id="in-c1-cpc" value="0.00" oninput="syncFromForm()">
+        </div>
+        <div class="form-group">
+          <label>Spent</label>
+          <input type="text" id="in-c1-spent" value="0.00" oninput="syncFromForm()">
+        </div>
+      </div>
+
+      <div class="section-title">📊 Campaign 2</div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label>Campaign Name</label>
+          <input type="text" id="in-c2-name" value="Puntexc Leads campaign" oninput="syncFromForm()">
+        </div>
+        <div class="form-group">
+          <label>Status Subtitle</label>
+          <input type="text" id="in-c2-sub" value="Off Leads" oninput="syncFromForm()">
+        </div>
+      </div>
+      <div class="grid-3">
+        <div class="form-group">
+          <label>Website Contacts</label>
+          <input type="text" id="in-c2-contacts" value="351" oninput="syncFromForm()">
+        </div>
+        <div class="form-group">
+          <label>Cost per Contact</label>
+          <input type="text" id="in-c2-cpc" value="2.38" oninput="syncFromForm()">
+        </div>
+        <div class="form-group">
+          <label>Spent</label>
+          <input type="text" id="in-c2-spent" value="833.64" oninput="syncFromForm()">
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label>Campaign 2 Thumbnail</label>
+          <input type="file" id="in-thumb-file" accept="image/*" onchange="handleThumbUpload(event)">
+        </div>
+        <div class="form-group">
+          <label>Floating Badge #</label>
+          <input type="text" id="in-ai-badge" value="1" oninput="syncFromForm()">
+        </div>
+      </div>
+
+      <div class="section-title">🎯 Opportunity & Status Bar</div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label>Opportunity Points</label>
+          <input type="number" id="in-opp-score" value="100" min="0" max="100" oninput="syncFromForm()">
+        </div>
+        <div class="form-group">
+          <label>Recommendations</label>
+          <input type="number" id="in-opp-rec" value="0" oninput="syncFromForm()">
+        </div>
+      </div>
+
+      <div class="grid-3">
+        <div class="form-group">
+          <label>Clock Time</label>
+          <input type="text" id="in-time" value="11:30" oninput="syncFromForm()">
+        </div>
+        <div class="form-group">
+          <label>Speed (KB/S)</label>
+          <input type="text" id="in-speed" value="17.8" oninput="syncFromForm()">
+        </div>
+        <div class="form-group">
+          <label>Battery %</label>
+          <input type="text" id="in-battery" value="43" oninput="syncFromForm()">
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label>Date Filter Text</label>
+          <input type="text" id="in-date-label" value="Date" oninput="syncFromForm()">
+        </div>
+        <div class="form-group">
+          <label>Status Filter Text</label>
+          <input type="text" id="in-status-label" value="Status" oninput="syncFromForm()">
+        </div>
+      </div>
+
+      <button class="btn btn-secondary btn-full" style="margin-top: 8px;" onclick="resetToDefaults()">
+        Reset to Original Defaults
+      </button>
+    </div>
+  </div>
+
+  <!-- DOWNLOAD PREVIEW MODAL -->
+  <div class="modal-overlay" id="downloadModal" data-html2canvas-ignore="true">
+    <div class="modal-card">
+      <h3 style="color:#fff; margin-bottom:4px;">Screenshot Ready!</h3>
+      <p style="font-size:0.8rem; color:#94a3b8;">Exact 9:16 (1080×1920) PNG generated.</p>
+      <img id="modalPreviewImg" class="modal-preview-img" alt="9:16 Screenshot">
+      <div class="modal-buttons">
+        <button class="btn btn-secondary" onclick="closeModal()">Close</button>
+        <a id="modalDownloadBtn" class="btn btn-primary" download="Meta_Ads_9x16.png">Save Image</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'meta_ads_mobile_app_state_v1';
+
+    function toggleDrawer(open) {
+      const sheet = document.getElementById('editorDrawer');
+      const backdrop = document.getElementById('drawerBackdrop');
+      if (open) {
+        sheet.classList.add('open');
+        backdrop.classList.add('open');
+      } else {
+        sheet.classList.remove('open');
+        backdrop.classList.remove('open');
+      }
+    }
+
+    function hideFloatingPill() {
+      document.getElementById('studioPill').classList.add('hidden-pill');
+      toggleDrawer(false);
+    }
+
+    function toggleNativePhoneMode() {
+      const bar = document.getElementById('app-status-bar');
+      const pill = document.getElementById('app-gesture-pill');
+      const label = document.getElementById('statusToggleText');
+      const isHidden = bar.style.display === 'none';
+
+      bar.style.display = isHidden ? 'flex' : 'none';
+      pill.style.display = isHidden ? 'block' : 'none';
+      label.innerText = isHidden ? 'Hide Fake Status Bar' : 'Show Fake Status Bar';
+    }
+
+    function syncFromForm() {
+      document.getElementById('ui-time').innerText = document.getElementById('in-time').value;
+      document.getElementById('ui-speed').innerText = document.getElementById('in-speed').value;
+
+      const batt = document.getElementById('in-battery').value;
+      document.getElementById('ui-battery').innerText = batt;
+      const battNum = Math.min(100, Math.max(5, parseInt(batt) || 43));
+      document.getElementById('ui-battery-fill').style.width = battNum + '%';
+
+      document.getElementById('ui-date-label').innerText = document.getElementById('in-date-label').value;
+      document.getElementById('ui-status-label').innerText = document.getElementById('in-status-label').value;
+
+      document.getElementById('ui-account-name').innerText = document.getElementById('in-account-name').value;
+      document.getElementById('ui-account-sub').innerText = document.getElementById('in-account-sub').value;
+
+      const cur = document.getElementById('in-currency').value;
+      document.querySelectorAll('.ui-currency').forEach(el => el.innerText = cur);
+
+      document.getElementById('ui-total-spent').innerText = document.getElementById('in-total-spent').value;
+      document.getElementById('ui-remaining-limit').innerText = document.getElementById('in-remaining-limit').value;
+
+      const oppScore = Math.min(100, Math.max(0, parseInt(document.getElementById('in-opp-score').value) || 0));
+      document.getElementById('ui-opp-score').innerText = oppScore;
+      document.getElementById('ui-opp-rec').innerText = document.getElementById('in-opp-rec').value;
+
+      const arcLen = 68;
+      const offset = arcLen - (oppScore / 100) * arcLen;
+      document.getElementById('ui-opp-gauge').setAttribute('stroke-dashoffset', offset);
+
+      document.getElementById('ui-c1-name').innerText = document.getElementById('in-c1-name').value;
+      document.getElementById('ui-c1-sub').innerText = document.getElementById('in-c1-sub').value;
+      document.getElementById('ui-c1-clicks').innerText = document.getElementById('in-c1-clicks').value;
+      document.getElementById('ui-c1-cpc').innerText = document.getElementById('in-c1-cpc').value;
+      document.getElementById('ui-c1-spent').innerText = document.getElementById('in-c1-spent').value;
+
+      document.getElementById('ui-c2-name').innerText = document.getElementById('in-c2-name').value;
+      document.getElementById('ui-c2-sub').innerText = document.getElementById('in-c2-sub').value;
+      document.getElementById('ui-c2-contacts').innerText = document.getElementById('in-c2-contacts').value;
+      document.getElementById('ui-c2-cpc').innerText = document.getElementById('in-c2-cpc').value;
+      document.getElementById('ui-c2-spent').innerText = document.getElementById('in-c2-spent').value;
+
+      document.getElementById('ui-ai-badge').innerText = document.getElementById('in-ai-badge').value;
+      saveState();
+    }
+
+    function syncToForm() {
+      document.getElementById('in-time').value = document.getElementById('ui-time').innerText;
+      document.getElementById('in-speed').value = document.getElementById('ui-speed').innerText;
+      document.getElementById('in-battery').value = document.getElementById('ui-battery').innerText;
+      document.getElementById('in-date-label').value = document.getElementById('ui-date-label').innerText;
+      document.getElementById('in-status-label').value = document.getElementById('ui-status-label').innerText;
+      document.getElementById('in-account-name').value = document.getElementById('ui-account-name').innerText;
+      document.getElementById('in-account-sub').value = document.getElementById('ui-account-sub').innerText;
+      document.getElementById('in-total-spent').value = document.getElementById('ui-total-spent').innerText;
+      document.getElementById('in-remaining-limit').value = document.getElementById('ui-remaining-limit').innerText;
+      document.getElementById('in-opp-score').value = document.getElementById('ui-opp-score').innerText;
+      document.getElementById('in-opp-rec').value = document.getElementById('ui-opp-rec').innerText;
+      document.getElementById('in-c1-name').value = document.getElementById('ui-c1-name').innerText;
+      document.getElementById('in-c1-sub').value = document.getElementById('ui-c1-sub').innerText;
+      document.getElementById('in-c1-clicks').value = document.getElementById('ui-c1-clicks').innerText;
+      document.getElementById('in-c1-cpc').value = document.getElementById('ui-c1-cpc').innerText;
+      document.getElementById('in-c1-spent').value = document.getElementById('ui-c1-spent').innerText;
+      document.getElementById('in-c2-name').value = document.getElementById('ui-c2-name').innerText;
+      document.getElementById('in-c2-sub').value = document.getElementById('ui-c2-sub').innerText;
+      document.getElementById('in-c2-contacts').value = document.getElementById('ui-c2-contacts').innerText;
+      document.getElementById('in-c2-cpc').value = document.getElementById('ui-c2-cpc').innerText;
+      document.getElementById('in-c2-spent').value = document.getElementById('ui-c2-spent').innerText;
+      document.getElementById('in-ai-badge').value = document.getElementById('ui-ai-badge').innerText;
+      saveState();
+    }
+
+    function handleThumbUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        document.getElementById('thumb-container').innerHTML = `<img src="${e.target.result}" alt="Ad Thumbnail">`;
+        localStorage.setItem(STORAGE_KEY + '_thumb', e.target.result);
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function saveState() {
+      const fields = [
+        'in-time','in-speed','in-battery','in-date-label','in-status-label',
+        'in-account-name','in-account-sub','in-currency','in-total-spent',
+        'in-remaining-limit','in-opp-score','in-opp-rec','in-c1-name','in-c1-sub',
+        'in-c1-clicks','in-c1-cpc','in-c1-spent','in-c2-name','in-c2-sub',
+        'in-c2-contacts','in-c2-cpc','in-c2-spent','in-ai-badge'
+      ];
+      const data = {};
+      fields.forEach(id => data[id] = document.getElementById(id).value);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    }
+
+    function loadState() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+        if (saved) {
+          Object.keys(saved).forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.value = saved[id];
+          });
+          syncFromForm();
+        }
+        const savedThumb = localStorage.getItem(STORAGE_KEY + '_thumb');
+        if (savedThumb) {
+          document.getElementById('thumb-container').innerHTML = `<img src="${savedThumb}" alt="Ad Thumbnail">`;
+        }
+      } catch (e) {}
+    }
+
+    function resetToDefaults() {
+      localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(STORAGE_KEY + '_thumb');
+      location.reload();
+    }
+
+    function closeModal() {
+      document.getElementById('downloadModal').style.display = 'none';
+    }
+
+    // Strict 9:16 (1080 x 1920) Screenshot Downloader from any phone or desktop screen
+    async function downloadScreenshot() {
+      toggleDrawer(false);
+      const phoneElement = document.getElementById('phone-screen');
+      const TARGET_WIDTH = 1080;
+      const TARGET_HEIGHT = 1920;
+
+      // Temporarily lock dimensions to 432x768 so export is always exact 9:16
+      phoneElement.classList.add('export-lock');
+
+      try {
+        const renderedCanvas = await html2canvas(phoneElement, {
+          width: 432,
+          height: 768,
+          scale: TARGET_WIDTH / 432,
+          useCORS: true,
+          backgroundColor: '#1d2731',
+          logging: false
+        });
+
+        phoneElement.classList.remove('export-lock');
+
+        const finalCanvas = document.createElement('canvas');
+        finalCanvas.width = TARGET_WIDTH;
+        finalCanvas.height = TARGET_HEIGHT;
+        const ctx = finalCanvas.getContext('2d');
+        ctx.drawImage(renderedCanvas, 0, 0, TARGET_WIDTH, TARGET_HEIGHT);
+
+        const imageURL = finalCanvas.toDataURL('image/png');
+        const filename = `Meta_Ads_9x16_${Date.now()}.png`;
+
+        const link = document.createElement('a');
+        link.download = filename;
+        link.href = imageURL;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        document.getElementById('modalPreviewImg').src = imageURL;
+        const modalBtn = document.getElementById('modalDownloadBtn');
+        modalBtn.href = imageURL;
+        modalBtn.download = filename;
+        document.getElementById('downloadModal').style.display = 'flex';
+      } catch (err) {
+        phoneElement.classList.remove('export-lock');
+        console.error('Screenshot failed:', err);
+        alert('Could not generate screenshot.');
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', loadState);
+  </script>
+</body>
+</html>
